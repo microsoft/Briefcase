@@ -1,0 +1,9 @@
+auth: &auth1
+  !azure.devicecode
+  tenantid: 72f988bf-86f1-41af-91ab-2d7cd011db47 
+
+myvault1:
+  !azure.keyvault
+  dnsname: https://workspacetest.vault.azure.net/
+  credential: &auth1
+
