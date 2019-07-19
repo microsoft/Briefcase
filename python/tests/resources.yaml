@@ -4,6 +4,10 @@ credentials:
     dnsname: https://webscaleai.vault.azure.net/
     tenantid: 72f988bf-86f1-41af-91ab-2d7cd011db47
 
+  armprovider:
+    !azure.arm.credentialstore
+    tenantid: 123a-234a
+
 datasources: # just convention, support arbitrary structure
   folder1:
     myblobsource1: &myblobsource1 
@@ -16,6 +20,11 @@ datasources: # just convention, support arbitrary structure
       accountname: storage2
       secrettype: SAS
 
+    unknown1:
+      !resouce
+      a: 1
+      b: 2
+      
   folder2:
     sqlalchemy:
       !python.sqlalchemy
@@ -67,6 +76,7 @@ datasets:
 services:
   cognitiveservice:
     anom1:
+      # semantic hierarchy organizing resources (-> MLSpec)
       !azure.cognitiveservice.anomalydetection
       credentialstore: 
         !python.keyring

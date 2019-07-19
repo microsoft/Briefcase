@@ -1,6 +1,7 @@
 # TODO. headers, comments
 import yaml
 from enum import Enum
+import datetime
 from ..base import Resource
 from ..datasource import URLDataSource
 
@@ -17,6 +18,9 @@ class AzureStorage(Resource):
 
         return self.secrettype
 
+    def is_secret_a_sas_token(self) -> bool:
+        return self.get_secrettype().lower() == 'sas'
+
     def get_client(self):
         if not hasattr(self, 'client'):
             # only import if method is used
@@ -24,7 +28,7 @@ class AzureStorage(Resource):
             
             # key vs SAS token
             account_key = sas_token = None
-            if self.get_secrettype().lower() == 'sas':
+            if self.is_secret_a_sas_token():
                 sas_token = self.get_secret()
             else:
                 account_key = self.get_secret()
@@ -49,6 +53,30 @@ class AzureBlob(URLDataSource):
         block_blob_service.get_blob_to_path(self.container_name, target, self.path)
 
     def get_url(self) -> str:
-        # append SAS token
-        # if SAS not there, create one       
-        pass
+        if not hasattr(self, 'datasource'):
+            raise Exception("requires azure storage account as data source")
+
+        if self.datasource.is_secret_a_sas_token():
+            sas_token = self.datasource.get_secret()
+        else:
+            from azure.storage.blob.sharedaccesssignature import BlobSharedAccessSignature
+            from azure.storage.blob.models import ContainerPermissions
+
+            # could also get SAS on the fly by getting ADAL context: https://github.com/Azure/azure-storage-python/blob/master/azure-storage-blob/azure/storage/blob/sharedaccesssignature.py
+            sas = BlobSharedAccessSignature(self.datasource.accountname, account_key=self.datasource.get_secret())
+
+            now = datetime.datetime.utcnow()
+            sas_token = sas.generate_blob(
+                self.containername, 
+                self.path,
+                permission=ContainerPermissions(read=True), # TODO: maybe write?
+                start= now - datetime.timedelta(hours=1), # this feels like trouble
+                expiry= now + datetime.timedelta(hours=12))
+
+        # TODO: secure vs non-secure
+        # other clouds
+        return "https://{}.blob.core.windows.net/{}/{}?{}".format(
+            self.datasource.accountname,
+            self.containername,
+            self.path,
+            sas_token)

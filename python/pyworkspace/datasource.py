@@ -17,7 +17,7 @@ class URLDataSource(DataSource):
         if hasattr(self, 'url'):
             return self.url
         else:
-            return self.datasource.get_url()
+            return self.dataset.get_url()
 
     def to_dataflow(self) -> 'dprep.Dataflow':
         import azureml.dataprep as dprep
@@ -37,4 +37,10 @@ class CSVDataSource(URLDataSource):
         # dprep.read_json
         # TODO: lookup method dprep.read_*
         # not sure if the **self.get_params() is such a great idea as it ain't portable?
-        return dprep.read_csv(self.get_url(),  **self.get_params('url'))
+        url = self.get_url()
+        try:
+            return dprep.read_csv(url, **self.get_params('dataset', 'url'))
+        except:
+            # since dprep doesn't forward the error message
+            import urllib.request
+            return urllib.request.urlopen(url).read()
