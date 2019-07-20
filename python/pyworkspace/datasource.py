@@ -14,6 +14,7 @@ class URLDataSource(DataSource):
         return urllib.request.urlretrieve(self.get_url(), filename, **kwargs)
 
     def get_url(self) -> str:
+        # TODO: check if getattr works too, check if the default is evaluated here
         if hasattr(self, 'url'):
             return self.url
         else:

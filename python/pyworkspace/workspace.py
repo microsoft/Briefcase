@@ -1,8 +1,9 @@
-import yaml
 import os
 from typing import Any, Callable, List, Union, Type
 import re
+import yaml
 
+# TODO: check if the imports are needed
 from .azure import *
 from .azure.cognitiveservice import *
 from .base import *
@@ -11,10 +12,13 @@ from .credentialprovider import *
 
 class Workspace:
     def __init__(self, path: str=None, content: str=None):
+        # TODO: think about multiple yamls and when to actually stop
+        # force user to supply path
+        # stop at .git directory (what about .svn?)
+
         # handle various defaults
         if content is None:
             if path is None:
-                # TODO: do we need to pass the search directory?
                 path = self.__find_yaml('.')
             
             with open(path, 'r') as f:
@@ -22,7 +26,7 @@ class Workspace:
 
         self.__parse(content)
 
-    def __find_yaml(self, path):   
+    def __find_yaml(self, path) -> str:   
         path = os.path.realpath(path)
 
         for name in os.listdir(path):
@@ -30,29 +34,38 @@ class Workspace:
             if name == 'resources.yaml' or name == 'resources.yml':
                 return os.path.join(path, name)
 
+        # going up the directory structure
         new_path = os.path.realpath(os.path.join(path, '..'))
-        if path == new_path:
+        if path == new_path: # hit the root
             raise Exception("Unable to find resources.yaml")
 
         return self.__find_yaml(new_path)
 
     def __parse(self, content: str):
-        # don't fail for future types
-        # TODO: don't set this up globally
-        # loader = yaml.Loader()
-        yaml.add_multi_constructor('!', lambda loader, suffix, node: None)
+        # TODO: don't fail for future types. the safe_load thing is the right approach, but
+        #       this will lead to failures ones new types are introduced and the workspace library
+        #       is still old... 
 
-        self.resources = yaml.load(content)
+        # Still loading using SafeLoader, but making sure unknown tags are ignored
+        # https://security.openstack.org/guidelines/dg_avoid-dangerous-input-parsing-libraries.html
+        # self.resources = yaml.safe_load(content)
+
+        class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
+            def ignore_unknown(self, node):
+                return None 
+        
+        SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
+        self.resources = yaml.load(content, Loader=SafeLoaderIgnoreUnknown)
 
         # visit all nodes and setup links
-        def setup_links(n, path, name):
-            n.__workspace = self
-            n.__path = path
-            n.__name = name        
+        def setup_links(node, path, name):
+            node.__workspace = self
+            node.__path = path
+            node.__name = name        
 
+        # setup root links to avoid back reference to credential provider
         self.visit(setup_links)
 
-    # setup root links to avoid back reference to credential provider
     def visit(self,
               action: Callable[[yaml.YAMLObject, List[str], str], Any],
               path: List[str] = [],

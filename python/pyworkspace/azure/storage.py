@@ -2,6 +2,7 @@
 import yaml
 from enum import Enum
 import datetime
+# TODO: from workspace.base import ... should work
 from ..base import Resource
 from ..datasource import URLDataSource
 
@@ -21,26 +22,23 @@ class AzureStorage(Resource):
     def is_secret_a_sas_token(self) -> bool:
         return self.get_secrettype().lower() == 'sas'
 
-    def get_client(self):
-        if not hasattr(self, 'client'):
-            # only import if method is used
-            from azure.storage.common import CloudStorageAccount
-            
-            # key vs SAS token
-            account_key = sas_token = None
-            if self.is_secret_a_sas_token():
-                sas_token = self.get_secret()
-            else:
-                account_key = self.get_secret()
-            
-            # TODO: endpoint_suffix
-            self.client = CloudStorageAccount(account_name=self.accountname,
-                                              account_key=account_key,
-                                              sas_token=sas_token,
-                                              is_emulated=self.__dict__.get("is_emulated", None),
-                                              endpoint_suffix=self.__dict__.get("endpoint_suffix", None))
+    def get_client_lazy(self):
+        # only import if method is used
+        from azure.storage.common import CloudStorageAccount
         
-        return self.client
+        # key vs SAS token
+        account_key = sas_token = None
+        if self.is_secret_a_sas_token():
+            sas_token = self.get_secret()
+        else:
+            account_key = self.get_secret()
+        
+        # TODO: endpoint_suffix
+        return CloudStorageAccount(account_name=self.accountname,
+                                            account_key=account_key,
+                                            sas_token=sas_token,
+                                            is_emulated=getattr(self, "is_emulated", None),
+                                            endpoint_suffix=getattr(self, "endpoint_suffix", None))
 
 class AzureBlob(URLDataSource):
     yaml_tag = u'!azure.blob'
@@ -70,11 +68,12 @@ class AzureBlob(URLDataSource):
                 self.containername, 
                 self.path,
                 permission=ContainerPermissions(read=True), # TODO: maybe write?
-                start= now - datetime.timedelta(hours=1), # this feels like trouble
-                expiry= now + datetime.timedelta(hours=12))
+                start=now - datetime.timedelta(hours=1), # this feels like trouble
+                expiry=now + datetime.timedelta(hours=12))
 
         # TODO: secure vs non-secure
         # other clouds
+        # TODO: urllib has path join method including encoding
         return "https://{}.blob.core.windows.net/{}/{}?{}".format(
             self.datasource.accountname,
             self.containername,

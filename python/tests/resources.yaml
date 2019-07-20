@@ -4,9 +4,10 @@ credentials:
     dnsname: https://webscaleai.vault.azure.net/
     tenantid: 72f988bf-86f1-41af-91ab-2d7cd011db47
 
-  armprovider:
-    !azure.arm.credentialstore
-    tenantid: 123a-234a
+ # TODO: add support for unknown types
+ #  armprovider:
+ #   !azure.arm.credentialstore
+ #   tenantid: 123a-234a
 
 datasources: # just convention, support arbitrary structure
   folder1:
@@ -21,7 +22,7 @@ datasources: # just convention, support arbitrary structure
       secrettype: SAS
 
     unknown1:
-      !resouce
+      !resource
       a: 1
       b: 2
       
