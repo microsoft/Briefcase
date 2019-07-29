@@ -10,8 +10,8 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='pyworkspace', 
-      version='0.1'
-      description='Manages your cloud resources across multiple tooling environments.',
+      version='0.1',
+      description='Manages your cloud resources across multiple executing environments.',
       url='http://github.com/Microsoft/Workspace',
       author='Markus Cozowicz',
       author_email='marcozo@microsoft.com',
@@ -31,6 +31,9 @@ setup(name='pyworkspace',
       python_requires='>=3',
       install_requires=['pyyaml'],
       extras_require={ 
-        'test': ['azureml-dataprep[pandas]', 'azure-keyvault'],
+        'test': ['azureml-dataprep[pandas]', 
+                 'azure-keyvault', 
+                 'sqlalchemy', 
+                 'keyring'],
       },
       packages=find_packages())

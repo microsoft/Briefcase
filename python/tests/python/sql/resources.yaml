@@ -1,0 +1,19 @@
+
+query1:
+  !python.sql.query
+  # sometimes I need a name here to lookup credentials.
+  # instead of assuming a fixed name, support whatever and just query for 'connection' type
+  datasource: 
+    !python.sql.connection
+    # in-memory database
+    drivername: sqlite
+    # from https://docs.sqlalchemy.org/en/13/core/engines.html
+    # drivername – the name of the database backend. This name will correspond to a module in sqlalchemy/databases or a third party plug-in.
+    # username – The user name.
+    # password – database password.
+    # host – The name of the host.
+    # port – The port number.
+    # database – The database name.
+    # query – A dictionary of options to be passed to the dialect and/or the DBAPI upon connect.
+  query: SELECT * FROM table1
+

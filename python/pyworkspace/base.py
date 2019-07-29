@@ -46,13 +46,18 @@ class Resource(yaml.YAMLObject):
         if hasattr(self, 'credentialstore'):
             return [self.credentialstore]
         else:
-            from .credentialprovider import CredentialProvider, KeyRingCredentialProvider, EnvironmentCredentialProvider
+            from .credentialprovider import CredentialProvider, EnvironmentCredentialProvider
+            from .python.keyring import KeyRingCredentialProvider
+            from .python.jupyterlab_credentialstore import JupyterLabCredentialStore
 
             return [ # *self.get_workspace().get_all_of_type(CredentialProvider),
+                    JupyterLabCredentialStore(),
                     KeyRingCredentialProvider(),
                     EnvironmentCredentialProvider()]
                 
     def get_name(self) -> str:
+        # allow the name to be overwritten from the parent 
+        # return getattr(self, 'name', self._Workspace__name)
         return self._Workspace__name
     
     def get_path(self) -> List[str]:

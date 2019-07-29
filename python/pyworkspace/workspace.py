@@ -9,6 +9,7 @@ from .azure.cognitiveservice import *
 from .base import *
 from .datasource import *
 from .credentialprovider import *
+from .python import *
 
 class Workspace:
     def __init__(self, path: str=None, content: str=None):
@@ -66,6 +67,26 @@ class Workspace:
         # setup root links to avoid back reference to credential provider
         self.visit(setup_links)
 
+    def visit_resource(self, 
+              action: Callable[[yaml.YAMLObject, List[str], str], Any],
+              path: List[str],
+              node: Any,
+              name: str) -> List:
+
+        ret = []
+
+        # execute action for the reousrce
+        v = action(node, path, name) 
+        if v is not None:
+            ret.append(v)
+
+        # recurse into yaml objects to support nested data defs
+        for k, n in node.__dict__.items():
+            if isinstance(n, yaml.YAMLObject):
+                ret.extend(self.visit_resource(action, [*path, name], node=n, name=k))
+
+        return ret
+
     def visit(self,
               action: Callable[[yaml.YAMLObject, List[str], str], Any],
               path: List[str] = [],
@@ -78,9 +99,7 @@ class Workspace:
             if isinstance(n, dict):
                 ret.extend(self.visit(action, [*path, k], n))
             elif isinstance(n, yaml.YAMLObject):
-                v = action(n, path, k) 
-                if v is not None:
-                    ret.append(v)
+                ret.extend(self.visit_resource(action, path, node=n, name=k))
 
         return ret
 
