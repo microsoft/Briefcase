@@ -5,4 +5,8 @@ sub1:
   # scenario
   # be on Azure Databricks
   # - get ARM authentication token using magic call
-  # - find 
+  # - find all storage accounts 
+  # https://docs.microsoft.com/en-us/azure/governance/resource-graph/samples/starter#list-specific-tag
+  # - find a specific storage account
+  # -- download data
+  # -- 
