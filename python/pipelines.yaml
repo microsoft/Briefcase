@@ -1,10 +1,6 @@
-pool:
-  vmImage: 'ubuntu-16.04' 
-
 parameters:
   pythonVersions: ["3.7", "3.6", "3.5"] #, "2.7"]
   operatingSystems: ["ubuntu-16.04", 'macos-10.13', 'vs2017-win2016']
-
 
 jobs:
 - job: 
