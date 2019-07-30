@@ -35,6 +35,7 @@ setup(name='pyworkspace',
                    'azure-keyvault',
                    'azure-storage-blob',
                    'sqlalchemy',
-                   'keyring'],
+                   'keyring',
+                   'pytest'],
       },
       packages=find_packages())
