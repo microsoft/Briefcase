@@ -8,13 +8,15 @@ steps:
 
 - script: |
     cd python
-    python install -e .[extra]
+    pip install -e .[extra]
   displayName: 'Install Package'
 
 - script: |
     cd python
     pytest --junitxml=junit/test-unitttest.xml
   displayName: 'Python Unit Tests'
+  env:
+    myserviceprincipal1: $(test_service_principal_secret)
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
