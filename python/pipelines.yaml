@@ -8,7 +8,7 @@ steps:
 
 - script: |
     cd python
-    pip install -e .[extra]
+    pip install -e .[test]
   displayName: 'Install Package'
 
 - script: |
