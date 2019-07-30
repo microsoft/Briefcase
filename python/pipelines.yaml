@@ -1,0 +1,22 @@
+pool:
+  vmImage: 'ubuntu-16.04' 
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.6'
+
+- script: |
+    cd python
+    python install -e .[extra]
+  displayName: 'Install Package'
+
+- script: |
+    cd python
+    pytest --junitxml=junit/test-unitttest.xml
+  displayName: 'Python Unit Tests'
+
+- task: PublishTestResults@2
+    inputs:
+      testResultsFiles: '**/test-unitttest.xml'
+      testRunTitle: 'Test results for PyTest'

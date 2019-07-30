@@ -6,34 +6,35 @@ from io import open
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the README file
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+with open(path.join(here, '..', 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-setup(name='pyworkspace', 
+setup(name='pyworkspace',
       version='0.1',
       description='Manages your cloud resources across multiple executing environments.',
       url='http://github.com/Microsoft/Workspace',
       author='Markus Cozowicz',
       author_email='marcozo@microsoft.com',
-      classifiers=[ 
-        'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
-        'Intended Audience :: Science/Research'
-        'Topic :: Software Development',
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
+      classifiers=[
+          'Development Status :: 3 - Alpha',
+          'Intended Audience :: Developers',
+          'Intended Audience :: Science/Research'
+          'Topic :: Software Development',
+          'License :: OSI Approved :: MIT License',
+          'Programming Language :: Python :: 3',
+          'Programming Language :: Python :: 3.4',
+          'Programming Language :: Python :: 3.5',
+          'Programming Language :: Python :: 3.6',
+          'Programming Language :: Python :: 3.7',
       ],
       keywords='cloud security resources',
       python_requires='>=3',
       install_requires=['pyyaml'],
-      extras_require={ 
-        'test': ['azureml-dataprep[pandas]', 
-                 'azure-keyvault', 
-                 'sqlalchemy', 
-                 'keyring'],
+      extras_require={
+          'test': ['azureml-dataprep[pandas]',
+                   'azure-keyvault',
+                   'azure-storage-blob',
+                   'sqlalchemy',
+                   'keyring'],
       },
       packages=find_packages())

@@ -11,8 +11,9 @@ from .datasource import *
 from .credentialprovider import *
 from .python import *
 
+
 class Workspace:
-    def __init__(self, path: str=None, content: str=None):
+    def __init__(self, path: str = None, content: str = None):
         # TODO: think about multiple yamls and when to actually stop
         # force user to supply path
         # stop at .git directory (what about .svn?)
@@ -21,13 +22,13 @@ class Workspace:
         if content is None:
             if path is None:
                 path = self.__find_yaml('.')
-            
+
             with open(path, 'r') as f:
                 content = f.read()
 
         self.__parse(content)
 
-    def __find_yaml(self, path) -> str:   
+    def __find_yaml(self, path) -> str:
         path = os.path.realpath(path)
 
         for name in os.listdir(path):
@@ -37,7 +38,7 @@ class Workspace:
 
         # going up the directory structure
         new_path = os.path.realpath(os.path.join(path, '..'))
-        if path == new_path: # hit the root
+        if path == new_path:  # hit the root
             raise Exception("Unable to find resources.yaml")
 
         return self.__find_yaml(new_path)
@@ -45,7 +46,7 @@ class Workspace:
     def __parse(self, content: str):
         # TODO: don't fail for future types. the safe_load thing is the right approach, but
         #       this will lead to failures ones new types are introduced and the workspace library
-        #       is still old... 
+        #       is still old...
 
         # Still loading using SafeLoader, but making sure unknown tags are ignored
         # https://security.openstack.org/guidelines/dg_avoid-dangerous-input-parsing-libraries.html
@@ -53,37 +54,42 @@ class Workspace:
 
         class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
             def ignore_unknown(self, node):
-                return None 
-        
-        SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
+                return None
+
+        SafeLoaderIgnoreUnknown.add_constructor(
+            None, SafeLoaderIgnoreUnknown.ignore_unknown)
         self.resources = yaml.load(content, Loader=SafeLoaderIgnoreUnknown)
 
         # visit all nodes and setup links
         def setup_links(node, path, name):
-            node.__workspace = self
-            node.__path = path
-            node.__name = name        
+            # make sure we don't overwrite path/name from a reference usage (e.g. *foo)
+            # &foo needs to come before *foo
+            if not hasattr(node, '_Workspace__workspace'):
+                node.__workspace = self
+                node.__path = path
+                node.__name = name
 
         # setup root links to avoid back reference to credential provider
         self.visit(setup_links)
 
-    def visit_resource(self, 
-              action: Callable[[yaml.YAMLObject, List[str], str], Any],
-              path: List[str],
-              node: Any,
-              name: str) -> List:
+    def visit_resource(self,
+                       action: Callable[[yaml.YAMLObject, List[str], str], Any],
+                       path: List[str],
+                       node: Any,
+                       name: str) -> List:
 
         ret = []
 
         # execute action for the reousrce
-        v = action(node, path, name) 
+        v = action(node, path, name)
         if v is not None:
             ret.append(v)
 
         # recurse into yaml objects to support nested data defs
         for k, n in node.__dict__.items():
             if isinstance(n, yaml.YAMLObject):
-                ret.extend(self.visit_resource(action, [*path, name], node=n, name=k))
+                ret.extend(self.visit_resource(
+                    action, [*path, name], node=n, name=k))
 
         return ret
 
@@ -113,7 +119,8 @@ class Workspace:
 
         if len(path) == 1:
             # search all
-            ret = self.visit(lambda node, _, name: node if name == key else None)
+            ret = self.visit(
+                lambda node, _, name: node if name == key else None)
             ret_len = len(ret)
 
             # make it convenient

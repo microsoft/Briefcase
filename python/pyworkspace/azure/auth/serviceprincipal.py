@@ -1,8 +1,9 @@
 from ...base import Resource
 
+
 class AzureServicePrincipal(Resource):
     yaml_tag = u'!azure.serviceprincipal'
-    
+
     def __init__(self, clientid, tenantid):
         self.clientid = clientid
         self.tenantid = tenantid
