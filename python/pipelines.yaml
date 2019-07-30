@@ -17,6 +17,7 @@ steps:
   displayName: 'Python Unit Tests'
 
 - task: PublishTestResults@2
+  condition: succeededOrFailed()
   inputs:
     testResultsFiles: '**/test-unitttest.xml'
     testRunTitle: 'Test results for PyTest'
