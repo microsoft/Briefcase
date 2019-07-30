@@ -36,6 +36,7 @@ setup(name='pyworkspace',
                    'azure-storage-blob',
                    'sqlalchemy',
                    'keyring',
+                   'keyrings.alt',  # not recommended for production
                    'secretstorage',
                    'pytest'],
       },
