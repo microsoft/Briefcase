@@ -64,10 +64,7 @@ class Workspace:
         def setup_links(node, path, name):
             # make sure we don't overwrite path/name from a reference usage (e.g. *foo)
             # &foo needs to come before *foo
-            if not hasattr(node, '_Workspace__workspace'):
-                node.__workspace = self
-                node.__path = path
-                node.__name = name
+            node.add_name(self, path, name)
 
         # setup root links to avoid back reference to credential provider
         self.visit(setup_links)

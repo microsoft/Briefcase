@@ -1,30 +1,35 @@
 import os
-import re 
+import re
 import yaml
 
-from typing import Dict, List, TYPE_CHECKING
+from typing import Dict, List, Set, TYPE_CHECKING
 if TYPE_CHECKING:
     import pandas as pd
     import azureml.dataprep as dprep
-    import pyspark.sql 
+    import pyspark.sql
+
 
 class Resource(yaml.YAMLObject):
     """The base class for resources referenced from resources.yaml
     """
     yaml_tag = u'!resource'
-    
+
     # based on https://github.com/yaml/pyyaml/issues/266
     yaml_loader = yaml.SafeLoader
 
-    def __init__(self, workspace=None, path=None, name: str=None):
+    def add_name(self, workspace, path, name: str):
         self.__workspace = workspace
-        self.__path = path
-        self.__name = name
+
+        if not hasattr(self, '_Resource__names'):
+            self.__names = set()
+
+        self.__names.add(name)
+        self.__names.add('.'.join([*path, name]))
 
     def get_params(self, *exclude: List[str]) -> Dict[str, str]:
         """Provides a list of configuration options provided by the user filtering out
            'exclude' parameters and internal attributes (e.g. prefixed with _)
-        
+
         Args:
             exclude: list of attributes to exclude from parameters.
 
@@ -32,8 +37,8 @@ class Resource(yaml.YAMLObject):
             Configuration options.
         """
         # TODO: filter credentialstore or change to _?
-        return {k:v for k,v in self.__dict__.items()
-                    if not (k.startswith('_') or k in exclude) }
+        return {k: v for k, v in self.__dict__.items()
+                if not (k.startswith('_') or k in exclude)}
 
     def get_credentials_providers(self):
         # TODO: the order of the providers
@@ -50,39 +55,36 @@ class Resource(yaml.YAMLObject):
             from .python.keyring import KeyRingCredentialProvider
             from .python.jupyterlab_credentialstore import JupyterLabCredentialStore
 
-            return [ # *self.get_workspace().get_all_of_type(CredentialProvider),
-                    JupyterLabCredentialStore(),
-                    KeyRingCredentialProvider(),
-                    EnvironmentCredentialProvider()]
-                
-    def get_name(self) -> str:
-        # allow the name to be overwritten from the parent 
-        # return getattr(self, 'name', self._Workspace__name)
-        return self._Workspace__name
-    
-    def get_path(self) -> List[str]:
-        return self._Workspace__path
+            return [  # *self.get_workspace().get_all_of_type(CredentialProvider),
+                JupyterLabCredentialStore(),
+                KeyRingCredentialProvider(),
+                EnvironmentCredentialProvider()]
+
+    def get_names(self) -> Set[str]:
+        return self.__names
 
     def get_workspace(self) -> 'Workspace':
-        return self._Workspace__workspace
+        return self.__workspace
 
     def get_secret(self, **kwargs) -> str:
         # rules to resolve
         # 3. resolve key by name
         # 3a. resolve key by path + name (. seperated)
-        names = set([self.get_name(), '.'.join([*self.get_path(), self.get_name()])])
 
         providers = self.get_credentials_providers()
+        names = self.get_names()
 
         # try all credential provides first
         for provider in providers:
-            for key in names: 
+            for key in names:
+                # print("Probing for secret: {} {}".format(provider, key))
                 secret = provider.get_secret(key, **kwargs)
 
                 if secret is not None:
                     return secret
 
-        raise KeyNotFoundException("Secret not found for keys {} not found".format(names))
+        raise KeyNotFoundException(
+            "Secret not found for keys {} not found".format(names))
 
     def get_client(self):
         if not hasattr(self, 'client'):
@@ -93,6 +95,7 @@ class Resource(yaml.YAMLObject):
             self.client = self.get_client_lazy()
 
         return self.client
+
 
 class KeyNotFoundException(Exception):
     pass

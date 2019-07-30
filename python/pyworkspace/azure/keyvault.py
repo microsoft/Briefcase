@@ -1,5 +1,6 @@
 import yaml
 from azure.keyvault import KeyVaultClient, KeyVaultAuthentication, KeyVaultId
+from azure.keyvault.models import KeyVaultErrorException
 from ..credentialprovider import CredentialProvider
 
 
@@ -21,5 +22,7 @@ class AzureKeyVault(CredentialProvider):
         return KeyVaultClient(auth)
 
     def get_secret(self, key, secret_version=KeyVaultId.version_none):
-        # TODO: catch exception and rethrow CredentialProviderKeyNotFound
-        return self.get_client().get_secret(self.dnsname, key, secret_version=secret_version).value
+        try:
+            return self.get_client().get_secret(self.dnsname, key, secret_version=secret_version).value
+        except KeyVaultErrorException as ex:
+            return None

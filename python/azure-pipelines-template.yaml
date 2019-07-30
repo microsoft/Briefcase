@@ -9,7 +9,7 @@ jobs:
     matrix:
       ${{ each py in parameters.pythonVersions }}:
           ${{ each os in parameters.operatingSystems }}:
-            ${{ format('{0}{1}', py, os) }}:
+            ${{ format(' {0} - {1}', py, os) }}:
               imageName: ${{ os }}
               python.version: ${{ py }}
 
