@@ -1,25 +1,37 @@
-pool:
-  vmImage: 'ubuntu-16.04' 
+parameters:
+  pythonVersions: ["3.7", "3.6", "3.5"] #, "2.7"]
+  operatingSystems: ["ubuntu-16.04", 'macos-10.13', 'vs2017-win2016']
 
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '3.6'
+jobs:
+- job: 
+  strategy:
+    matrix:
+      ${{ each job in parameters.jobs }}:
+        ${{ each py in parameters.pythonVersions }}:
+            ${{ each os in parameters.operatingSystems }}:
+              ${{ format('{0}{1}', py, os) }}:
+                vmImage: ${os}
+                python.version: ${py}
 
-- script: |
-    cd python
-    pip install -e .[test]
-  displayName: 'Install Package'
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
 
-- script: |
-    cd python
-    pytest --junitxml=junit/test-unitttest.xml
-  displayName: 'Python Unit Tests'
-  env:
-    myserviceprincipal1: $(test_service_principal_secret)
+  - script: |
+      cd python
+      pip install -e .[test]
+    displayName: 'Install Package'
 
-- task: PublishTestResults@2
-  condition: succeededOrFailed()
-  inputs:
-    testResultsFiles: '**/test-unitttest.xml'
-    testRunTitle: 'Test results for PyTest'
+  - script: |
+      cd python
+      pytest --junitxml=junit/test-unitttest.xml
+    displayName: 'Python Unit Tests'
+    env:
+      myserviceprincipal1: $(test_service_principal_secret)
+
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFiles: '**/test-unitttest.xml'
+      testRunTitle: 'Test results for PyTest'
