@@ -6,8 +6,8 @@ from io import open
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the README file
-with open(path.join(here, '..', 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+# with open(path.join(here, '..', 'README.md'), encoding='utf-8') as f:
+#    long_description = f.read()
 
 setup(name='pyworkspace',
       version='0.1',
@@ -36,6 +36,7 @@ setup(name='pyworkspace',
                    'azure-storage-blob',
                    'sqlalchemy',
                    'keyring',
+                   'secretstorage',
                    'pytest'],
       },
       packages=find_packages())
