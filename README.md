@@ -85,4 +85,4 @@ As we go along we're actively working with toolset owners (e.g. VSCode extension
 # Python
 
 cd python
-pip install -e . 
+pip install -e .[test]
