@@ -3,20 +3,24 @@ parameters:
   operatingSystems: ["ubuntu-16.04", 'macos-10.13', 'vs2017-win2016']
 
 jobs:
-- job: 
+- job:
+  displayName: 'Python'
   strategy:
     matrix:
-      ${{ each job in parameters.jobs }}:
-        ${{ each py in parameters.pythonVersions }}:
-            ${{ each os in parameters.operatingSystems }}:
-              ${{ format('{0}{1}', py, os) }}:
-                vmImage: ${os}
-                python.version: ${py}
+      ${{ each py in parameters.pythonVersions }}:
+          ${{ each os in parameters.operatingSystems }}:
+            ${{ format('{0}{1}', py, os) }}:
+              imageName: ${{ os }}
+              python.version: ${{ py }}
+
+  pool:
+    vmImage: $(imageName)
 
   steps:
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: $(python.version)
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
 
   - script: |
       cd python
