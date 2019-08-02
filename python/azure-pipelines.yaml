@@ -1,2 +1,14 @@
-jobs:
-- template: azure-pipelines-template.yaml
+stages:
+- stage: Compliance
+  jobs:
+  - job: 
+    steps:
+    - task: ComponentGovernanceComponentDetection@0
+      inputs:
+        scanType: 'Register'
+        verbosity: 'Verbose'
+        alertWarningLevel: 'High'
+
+- stage: Python
+  jobs:
+    - template: azure-pipelines-template.yaml
