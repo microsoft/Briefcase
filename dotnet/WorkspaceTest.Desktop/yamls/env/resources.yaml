@@ -18,10 +18,7 @@ workspacetest1: &workspacetest1
   accountname: workspacetest
   credentialstore: *myvault1
   
-csv1:
-  !csv
-  separator: "\t"
-  dataset:
+dataset:
     !azure.storage.blob
     containername: test
     path: test.csv

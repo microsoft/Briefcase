@@ -12,12 +12,12 @@ credentials:
 datasources: # just convention, support arbitrary structure
   folder1:
     myblobsource1: &myblobsource1 
-      !azure.storage
+      !azure.storage.account
       accountname: webscaleai
       credentialstore: *myvault1
 
     myblobsource2: &myblobsource2 
-      !azure.storage
+      !azure.storage.account
       accountname: storage2
       secrettype: SAS
 
@@ -47,13 +47,13 @@ cogservices:
 datasets:
   criteo:
     day0:
-      !azure.blob
+      !azure.storage.blob
       datasource: *myblobsource1
       containername: criteo
       path: 1_csv/day_0.gz
 
     all_days: &all_days
-      !azure.blob
+      !azure.storage.blob
       datasource: *myblobsource1
       containername: criteo
       path: 1_csv/*gz

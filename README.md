@@ -1,5 +1,12 @@
 
-[![Build Status](https://dev.azure.com/ossworkspace/Workspace/_apis/build/status/microsoft.Workspace?branchName=master)](https://dev.azure.com/ossworkspace/Workspace/_build/latest?definitionId=1&branchName=master)
+[![Build Status](https://dev.azure.com/ossworkspace/Workspace/_apis/build/status/Microsoft.Workspace%20Python?branchName=master)](https://dev.azure.com/ossworkspace/Workspace/_build/latest?definitionId=1&branchName=master)
+Python
+
+[![Build Status](https://dev.azure.com/ossworkspace/Workspace/_apis/build/status/Microsoft.Workspace%20DotNet%20Core?branchName=master)](https://dev.azure.com/ossworkspace/Workspace/_build/latest?definitionId=3&branchName=master)
+.NET Core
+
+[![Build Status](https://dev.azure.com/ossworkspace/Workspace/_apis/build/status/Microsoft.Workspace%20DotNet%20Desktop?branchName=master)](https://dev.azure.com/ossworkspace/Workspace/_build/latest?definitionId=2&branchName=master)
+.NET Desktop
 
 # Contributing
 

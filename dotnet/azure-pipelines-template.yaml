@@ -1,0 +1,53 @@
+parameters:
+  operatingSystems: ["ubuntu-16.04", 'macos-10.13', 'vs2017-win2016']
+
+jobs:
+- job:
+  displayName: '.NET Core'
+  strategy:
+    matrix:
+        ${{ each os in parameters.operatingSystems }}:
+          ${{ format('{0}', os) }}:
+            imageName: ${{ os }}
+
+  pool:
+    vmImage: $(imageName)
+
+  steps:
+  - task: DotNetCoreInstaller@0
+    inputs:
+      version: '2.1.300'
+
+  - script: |
+      cd dotnet
+      dotnet restore
+    displayName: NuGet Restore
+
+  - task: DotNetCoreCLI@2
+    displayName: Build
+    inputs:
+      command: build
+      projects: |
+        dotnet/Workspace/*.csproj
+        dotnet/Workspace.Azure.KeyVault/*.csproj
+        dotnet/Workspace.Azure.Storage/*.csproj
+        dotnet/Workspace.AzureActiveDirectory/*.csproj
+        dotnet/WorkspaceTest/*.csproj
+      arguments: '--configuration Release'
+
+  - task: DotNetCoreCLI@2
+    displayName: Test
+    inputs:
+      command: test
+      projects: 'dotnet/WorkspaceTest/*.csproj'
+      # broken on ubuntu/mac --collect "Code coverage"
+      arguments: '--configuration Release '
+
+# TODO: nuget
+# - script: dotnet pack /p:PackageVersion=$(version)  # define version variable elsewhere in your pipeline
+# - task: NuGetCommand@2
+    # command: push
+    # nuGetFeedType: external
+    # publishFeedCredentials: '<Name of the NuGet service connection>'
+    # versioningScheme: byEnvVar
+    # versionEnvVar: version

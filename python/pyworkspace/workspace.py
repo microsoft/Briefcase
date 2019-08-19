@@ -33,7 +33,7 @@ class Workspace:
 
         for name in os.listdir(path):
             # TODO: allow for different name. global param? ctor param?
-            if name == 'resources.yaml' or name == 'resources.yml':
+            if name == 'resources.yaml':
                 return os.path.join(path, name)
 
         # going up the directory structure

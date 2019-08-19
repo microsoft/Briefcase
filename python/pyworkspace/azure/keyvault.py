@@ -1,4 +1,3 @@
-import yaml
 from azure.keyvault import KeyVaultClient, KeyVaultAuthentication, KeyVaultId
 from azure.keyvault.models import KeyVaultErrorException
 from ..credentialprovider import CredentialProvider

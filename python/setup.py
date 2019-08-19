@@ -34,6 +34,7 @@ setup(name='pyworkspace',
           'test': ['azureml-dataprep[pandas]',
                    'azure-keyvault',
                    'azure-storage-blob',
+                   'azure-mgmt-subscription',
                    'sqlalchemy',
                    'keyring',
                    'keyrings.alt',  # not recommended for production

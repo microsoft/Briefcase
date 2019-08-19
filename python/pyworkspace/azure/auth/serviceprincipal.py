@@ -8,7 +8,7 @@ class AzureServicePrincipal(Resource):
         self.clientid = clientid
         self.tenantid = tenantid
 
-    def get_client(self):
+    def get_client_lazy(self):
         from azure.common.credentials import ServicePrincipalCredentials
 
         # TODO add cloud environment

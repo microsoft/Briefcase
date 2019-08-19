@@ -4,7 +4,7 @@ trigger:
     - master
   paths:
     include:
-    - python/*
+    - dotnet/*
 
 stages:
 - stage: Compliance
@@ -17,6 +17,6 @@ stages:
         verbosity: 'Verbose'
         alertWarningLevel: 'High'
 
-- stage: Python
+- stage: DotNetCore 
   jobs:
-    - template: azure-pipelines-template.yaml
+  - template: azure-pipelines-template.yaml
