@@ -110,3 +110,9 @@ dotnet/**/bin
 dotnet/**/obj
 dotnet/**/packages
 dotnet/**/*.csproj.user
+
+# JavaScript
+typescript/**/node_modules
+typescript/**/dist
+typescript/**/docs
+

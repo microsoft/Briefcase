@@ -8,6 +8,9 @@ Python
 [![Build Status](https://dev.azure.com/ossworkspace/Workspace/_apis/build/status/Microsoft.Workspace%20DotNet%20Desktop?branchName=master)](https://dev.azure.com/ossworkspace/Workspace/_build/latest?definitionId=2&branchName=master)
 .NET Desktop
 
+[![Build Status](https://dev.azure.com/ossworkspace/Workspace/_apis/build/status/Microsoft.Workspace%20TypeScript?branchName=master)](https://dev.azure.com/ossworkspace/Workspace/_build/latest?definitionId=4&branchName=master)
+TypeScript
+
 # Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
