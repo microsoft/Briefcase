@@ -21,7 +21,8 @@ class Resource(yaml.YAMLObject):
         child.__workspace = self.__workspace
         child.__names = self.__names
         # TODO: probably searching up the path is a better choice?
-        child.credentialstore = self.credentialstore
+        if hasattr(self, 'credentialstore'):
+            child.credentialstore = self.credentialstore
 
     def add_name(self, workspace, path, name: str):
         self.__workspace = workspace
@@ -54,7 +55,7 @@ class Resource(yaml.YAMLObject):
 
         # 1. check credentials attribute
         # 1a. find all credential stores (sort alphabetical)
-        if hasattr(self, 'credentialstore'):
+        if hasattr(self, 'credentialstore') and self.credentialstore is not None:
             return [self.credentialstore]
         else:
             from .credentialprovider import CredentialProvider, EnvironmentCredentialProvider
