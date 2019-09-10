@@ -17,6 +17,12 @@ class Resource(yaml.YAMLObject):
     # based on https://github.com/yaml/pyyaml/issues/266
     yaml_loader = yaml.SafeLoader
 
+    def update_child(self, child):
+        child.__workspace = self.__workspace
+        child.__names = self.__names
+        # TODO: probably searching up the path is a better choice?
+        child.credentialstore = self.credentialstore
+
     def add_name(self, workspace, path, name: str):
         self.__workspace = workspace
 

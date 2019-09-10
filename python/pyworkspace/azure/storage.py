@@ -104,7 +104,26 @@ class AzureBlob(URLDataSource):
 
     def get_url(self) -> str:
         if not hasattr(self, 'datasource'):
-            raise Exception("requires azure storage account as data source")
+            if not hasattr(self, 'url'):
+                raise Exception(
+                    "requires azure storage account as data source")
+
+            import urllib.parse
+
+            components = urllib.parse.urlparse(self.url)
+
+            # TODO: http/https
+            hostAndPort = components.netloc.split(':')
+
+            # support other azure clouds (public, gov, ...)
+            accountname = hostAndPort[0].split('.')[0]
+
+            self.datasource = AzureStorage(accountname)
+            self.update_child(self.datasource)
+
+            path = components.path.split('/')
+            self.containername = path[1]
+            self.path = str.join('/', path[2:])
 
         if self.datasource.is_secret_a_sas_token():
             sas_token = self.datasource.get_secret()
