@@ -2,6 +2,7 @@ import os
 from typing import Any, Callable, List, Union, Type
 import re
 import yaml
+import logging
 
 # TODO: check if the imports are needed
 from .azure import *
@@ -13,6 +14,8 @@ from .python import *
 
 
 class Workspace:
+    logger = logging.getLogger('workspace')
+
     def __init__(self, path: str = None, content: str = None):
         # TODO: think about multiple yamls and when to actually stop
         # force user to supply path
@@ -23,6 +26,7 @@ class Workspace:
             if path is None:
                 path = self.__find_yaml('.')
 
+            self.logger.debug('workspace: {}'.format(path))
             with open(path, 'r') as f:
                 content = f.read()
 

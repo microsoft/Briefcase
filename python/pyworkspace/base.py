@@ -1,6 +1,7 @@
 import os
 import re
 import yaml
+import logging
 
 from typing import Dict, List, Set, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -13,6 +14,7 @@ class Resource(yaml.YAMLObject):
     """The base class for resources referenced from resources.yaml
     """
     yaml_tag = u'!resource'
+    logger = logging.getLogger('workspace')
 
     # based on https://github.com/yaml/pyyaml/issues/266
     yaml_loader = yaml.SafeLoader
@@ -84,10 +86,11 @@ class Resource(yaml.YAMLObject):
         # try all credential provides first
         for provider in providers:
             for key in names:
-                # print("Probing for secret: {} {}".format(provider, key))
+                self.logger.debug("secret probing: {} for {} ...".format(provider.__class__.__name__, key))
                 secret = provider.get_secret(key, **kwargs)
 
                 if secret is not None:
+                    self.logger.debug("secret found:  {} {}".format(provider.__class__.__name__, key))
                     return secret
 
         raise KeyNotFoundException(

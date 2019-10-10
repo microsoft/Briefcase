@@ -40,6 +40,7 @@ class AzureStorage(AzureResource):
                 # loop through subscriptions
                 for sub in self.get_subscriptions():
                     for id in sub.get_ids():
+                        self.logger.debug("secret probing: searching Azure subscription '{}' for azure storage account '{}'".format(id, self.accountname))
                         storage_client = StorageManagementClient(
                             auth_client, id)
 
@@ -54,6 +55,7 @@ class AzureStorage(AzureResource):
                             if resource_group is None:
                                 continue
 
+                        self.logger.debug("secret found:  Azure storage account '{}' in resource group '{}'".format(self.accountname, resource_group))
                         storage_keys = storage_client.storage_accounts.list_keys(
                             resource_group, self.accountname)
                         # TODO: this seems to be model dependent?

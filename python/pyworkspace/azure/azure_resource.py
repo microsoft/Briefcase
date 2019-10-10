@@ -11,7 +11,7 @@ class AzureResource(Resource):
         # no subscriptions configured try to auto resolve through MSI
         if len(subscriptions) == 0:
             subscriptions.append(AzureSubscription())
-
+        
         return subscriptions
 
     def get_resource_group(self):
@@ -20,6 +20,7 @@ class AzureResource(Resource):
     def get_auth_client(self):
         if not hasattr(self, 'auth_client'):
                 # fallback to MSI
+            self.logger.debug('auth client lookup: defaulting to Microsoft Managed Service Identity')
             self.auth_client = ManagedServiceIdentity()
 
             # this can also be a service principal or device auth
