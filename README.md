@@ -25,6 +25,37 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
+# Demo
+![Demo recording](images/demo1.gif)
+
+## What is happening?
+
+* This scenario shows how to levarage your idenity on [Azure Notebook](https://notebooks.azure.com) to securely access project resources.
+* The already created _resources.yaml_ contains all resources our project references. This can be blobs, databases, ... (see full list below). The referenced Azure Storage blob is *not* public, but requires authentication.
+* We can authorize our notebook to access Azure resources by hitting the "Azure/Connect to Azure..." button
+* Now we can create the Workspace object that helps us manage resources and simplifies credential management
+  * When looking up the resource 'workspacetest1' and retrieving the url the credential lookup process is triggered.
+  * First credential providers configured in the yaml are probed (none in the example).
+  * Second silent credential providers are probed (e.g. environment variables).
+  * Third we're falling back Microsoft Managed Service Identity.
+  * Since no Azure subscription is referenced in the yaml we enumerate all available.
+  * We search all Azure subscriptions for the Azure Storage account 'workspacetest' and retrieve the key.
+  * Finally we found the storage account keys and are able to generate a URL with an SAS token
+* At this point we can start with the data science work and look at the data using Pandas.
+
+## How to get the logging to work on Jupyter?
+
+Add the following cells to your Jupyter notebook (and yes the first cell throws an error, but that seems to be required).
+
+```python
+%config Application.log_level='WORKAROUND'
+```
+
+```python
+import logging
+logging.getLogger('workspace').setLevel(logging.DEBUG)
+```
+
 # What is it?
 _Workspace_ was created to manage all your authoring time service connection strings and *dataset* references in a *resources.yaml*
 usually located at the root of your git repository.
