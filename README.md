@@ -43,6 +43,62 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
   * Finally we found the storage account keys and are able to generate a URL with an SAS token
 * At this point we can start with the data science work and look at the data using Pandas.
 
+# Features
+
+## Resource
+
+| Resource | Python | C# | JavaScript |
+|---|:---:|:---:|:---:|
+| Azure Blobs | :heavy_check_mark: | :heavy_check_mark: |  |
+| Azure Cognitive Service Anomaly Detection | :heavy_check_mark: |  |  |
+| Azure Cognitive Service Content Moderator | :heavy_check_mark: |  |  |
+| Azure Cognitive Service Face | :heavy_check_mark: |  |  |
+| Azure Cognitive Service Vision | :heavy_check_mark: |  |  |
+| Azure Cognitive Service Spell Check | :heavy_check_mark: |  |  |
+| Azure Cognitive Service Spell Text Analytics | :heavy_check_mark: |  |  |
+| Azure KeyVault | :heavy_check_mark: | :heavy_check_mark: |  |
+| Python SQL Alchemy (PostgreSQL, MySQL, SQLite, Oracle, Microsoft SQL Server) | :heavy_check_mark: |  |  |
+
+## Authentication
+
+| Type | Python | C# | JavaScript |
+|---|:---:|:---:|:---:|
+| Azure Device Login | :heavy_check_mark: |  |  |
+| Azure Service Principal | :heavy_check_mark: | :heavy_check_mark: |  |
+| Azure Managed Service Identity | :heavy_check_mark: |  |  |
+| Windows Integrated |  | :heavy_check_mark: |  |
+| Environment Variables | :heavy_check_mark: | :heavy_check_mark: |  |
+| Python KeyRing | :heavy_check_mark: |  |  |
+| JupyterLab Credentials | :heavy_check_mark: |  |  |
+
+If **no** credential provider is configured for a resource the following stores are probed in order:
+
+1. JupyterLab Credentials
+2. Python KeyRing
+3. Environment variables
+
+Credential lookup is performed using both full-qualified name (=path in yaml) or the leaf name.
+
+For Azure resources the following methods are probed:
+
+1. Azure Managed Service identity (e.g. available in Azure Notebooks)
+2. Azure Device Login
+
+## Languages
+
+| Language | Audience | Use-case | Features |
+|---|---|---|---|
+| Python | Data Scientists | Data access from Notebooks across multiple environments (Azure ML notebook VM, Azure Notebooks, local) | Most |
+| C# | Engineers | Unit tests (during build and locally ) | Basic azure authentication and blob access |
+| JavaScript/TypeScript | Data Scientists & Engineers | Enable VSCode scenarios | Basic parsing |
+
+## Extensible YAML format
+
+The resource YAML format allows for arbitrary structure to model groups.
+Resources must be marked using YAML tags (e.g. !azure.storage.blob).
+
+# FAQ
+
 ## How to get the logging to work on Jupyter?
 
 Add the following cells to your Jupyter notebook (and yes the first cell throws an error, but that seems to be required).

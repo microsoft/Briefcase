@@ -40,8 +40,13 @@ class CSVDataSource(URLDataSource):
         # not sure if the **self.get_params() is such a great idea as it ain't portable?
         url = self.get_url()
         try:
-            return dprep.read_csv(url, **self.get_params('dataset', 'url'))
-        except:
+            ds = url
+            if url.startswith('http://') or url.startswith('https://'):
+                ds = dprep.HttpDataSource(url)
+            return dprep.read_csv(ds, **self.get_params('dataset', 'url'))
+        except Exception as e:
+            self.get_logger().warning("unable to fetch data using dprep. falling back to url download: {}".format(e))
+
             # since dprep doesn't forward the error message
             import urllib.request
             return urllib.request.urlopen(url).read()

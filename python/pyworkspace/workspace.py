@@ -6,12 +6,10 @@ import logging
 
 # TODO: check if the imports are needed
 from .azure import *
-from .azure.cognitiveservice import *
 from .base import *
 from .datasource import *
 from .credentialprovider import *
 from .python import *
-
 
 class Workspace:
     def __init__(self, path: str = None, content: str = None):
@@ -58,6 +56,7 @@ class Workspace:
 
         class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
             def ignore_unknown(self, node):
+
                 return None
 
         SafeLoaderIgnoreUnknown.add_constructor(

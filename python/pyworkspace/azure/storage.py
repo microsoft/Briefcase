@@ -2,11 +2,9 @@
 import yaml
 from enum import Enum
 import datetime
-# TODO: from workspace.base import ... should work
-from ..base import KeyNotFoundException, Resource
+from ..base import KeyNotFoundException
 from ..datasource import URLDataSource
 from .azure_resource import AzureResource
-
 
 class AzureStorage(AzureResource):
     yaml_tag = u'!azure.storage.account'

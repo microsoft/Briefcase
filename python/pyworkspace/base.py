@@ -19,10 +19,10 @@ class Resource(yaml.YAMLObject):
     yaml_loader = yaml.SafeLoader
 
     def get_logger(self):
-        if not hasattr(self, 'logger'):
-            self.logger = logging.getLogger('workspace')
+        if not hasattr(self, '_logger'):
+            self._logger = logging.getLogger('workspace')
         
-        return self.logger
+        return self._logger
 
     def update_child(self, child):
         child.__workspace = self.__workspace
