@@ -14,10 +14,15 @@ class Resource(yaml.YAMLObject):
     """The base class for resources referenced from resources.yaml
     """
     yaml_tag = u'!resource'
-    logger = logging.getLogger('workspace')
-
+    
     # based on https://github.com/yaml/pyyaml/issues/266
     yaml_loader = yaml.SafeLoader
+
+    def get_logger(self):
+        if not hasattr(self, 'logger'):
+            self.logger = logging.getLogger('workspace')
+        
+        return self.logger
 
     def update_child(self, child):
         child.__workspace = self.__workspace
@@ -25,6 +30,8 @@ class Resource(yaml.YAMLObject):
         # TODO: probably searching up the path is a better choice?
         if hasattr(self, 'credentialstore'):
             child.credentialstore = self.credentialstore
+            
+        return child
 
     def add_name(self, workspace, path, name: str):
         self.__workspace = workspace
@@ -86,11 +93,11 @@ class Resource(yaml.YAMLObject):
         # try all credential provides first
         for provider in providers:
             for key in names:
-                self.logger.debug("secret probing: {} for {} ...".format(provider.__class__.__name__, key))
+                self.get_logger().debug("secret probing: {} for {} ...".format(provider.__class__.__name__, key))
                 secret = provider.get_secret(key, **kwargs)
 
                 if secret is not None:
-                    self.logger.debug("secret found:  {} {}".format(provider.__class__.__name__, key))
+                    self.get_logger().debug("secret found:  {} {}".format(provider.__class__.__name__, key))
                     return secret
 
         raise KeyNotFoundException(

@@ -8,13 +8,17 @@ class ManagedServiceIdentity(Resource):
         pass
 
     def get_client_lazy(self):
+        return self.get_client_for_resource()
+        
+    def get_client_for_resource(self, resource='https://management.core.windows.net/'):
+        # TODO: cache client
         try:
             from msrestazure.azure_active_directory import MSIAuthentication
 
-            # TODO: add support for other resource types
-            msi_auth = MSIAuthentication()
+            msi_auth = MSIAuthentication(resource)
             msi_auth.set_token()
 
             return msi_auth
         except Exception as e:
             return None
+        

@@ -33,11 +33,12 @@ class AzureSubscription(AzureResource):
                 try:
                     # let's try to enumerate subscriptions
                     from azure.mgmt.subscription import SubscriptionClient
-                    subscription_client = SubscriptionClient(auth)
+                    subscription_client = SubscriptionClient(auth.get_client())
 
                     ret.extend(map(lambda s: s.subscription_id,
                                    subscription_client.subscriptions.list()))
-                except:
+                except Exception as e:
+                    self.logger.debug('unable to auto-resolve Azure subscriptions as no auth_client found {}'.format(e))
                     pass
             else:
                 self.logger.debug('unable to auto-resolve Azure subscriptions as no auth_client found')

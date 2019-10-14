@@ -14,9 +14,8 @@ from .python import *
 
 
 class Workspace:
-    logger = logging.getLogger('workspace')
-
     def __init__(self, path: str = None, content: str = None):
+        self.logger = logging.getLogger('workspace')
         # TODO: think about multiple yamls and when to actually stop
         # force user to supply path
         # stop at .git directory (what about .svn?)
@@ -31,6 +30,7 @@ class Workspace:
                 content = f.read()
 
         self.__parse(content)
+        self.globals = {}
 
     def __find_yaml(self, path) -> str:
         path = os.path.realpath(path)
@@ -115,6 +115,20 @@ class Workspace:
 
     key_split_regex = re.compile('[./]')
 
+    def get_global(self, key: str, type: Type):
+        # combine key with type to make it unique
+        key = '{}.{}'.format(key, type.__name__)
+        
+        if not(key in self.globals):
+            self.logger.debug('registering global: {}'.format(key))
+            
+            resource = type()
+            resource.add_name(self, [], key)
+            
+            self.globals[key] = resource
+        
+        return self.globals[key]
+    
     def __getitem__(self, key: str) -> Union[Resource, List[Resource]]:
         path = Workspace.key_split_regex.split(key)
 

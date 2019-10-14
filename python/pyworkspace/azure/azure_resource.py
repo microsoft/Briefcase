@@ -1,6 +1,4 @@
 from ..base import Resource
-from .auth.managed_service_identity import ManagedServiceIdentity
-
 
 class AzureResource(Resource):
     def get_subscriptions(self) -> 'List[AzureSubscription]':
@@ -10,7 +8,9 @@ class AzureResource(Resource):
 
         # no subscriptions configured try to auto resolve through MSI
         if len(subscriptions) == 0:
-            subscriptions.append(AzureSubscription())
+            sub = self.update_child(AzureSubscription())
+            
+            subscriptions.append(sub)
         
         return subscriptions
 
@@ -19,9 +19,20 @@ class AzureResource(Resource):
 
     def get_auth_client(self):
         if not hasattr(self, 'auth_client'):
-                # fallback to MSI
-            self.logger.debug('auth client lookup: defaulting to Microsoft Managed Service Identity')
-            self.auth_client = ManagedServiceIdentity()
-
-            # this can also be a service principal or device auth
-        return self.auth_client.get_client()
+            from .auth.managed_service_identity import ManagedServiceIdentity
+            
+            # fallback to MSI
+            self.get_logger().debug('auth client lookup: defaulting to Microsoft Managed Service Identity')
+            self.auth_client = self.get_workspace().get_global('azure_auth_client', ManagedServiceIdentity)
+            
+            client = self.auth_client.get_client()
+            if client is None:
+                # import only when needed
+                from .auth.user_with_device_code import AzureUserWithDeviceLogin
+                
+                self.get_logger().debug('auth client lookup: defaulting to Microsoft User with Device Login')
+                
+                self.auth_client = self.get_workspace().get_global('azure_auth_client', AzureUserWithDeviceLogin)
+            
+        # this can also be a service principal or device auth
+        return self.auth_client # .get_client()

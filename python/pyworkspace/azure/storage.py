@@ -42,7 +42,7 @@ class AzureStorage(AzureResource):
                     for id in sub.get_ids():
                         self.logger.debug("secret probing: searching Azure subscription '{}' for azure storage account '{}'".format(id, self.accountname))
                         storage_client = StorageManagementClient(
-                            auth_client, id)
+                            auth_client.get_client(), id)
 
                         if resource_group is None:
                             for acc in storage_client.storage_accounts.list():
@@ -62,7 +62,6 @@ class AzureStorage(AzureResource):
                         return storage_keys.keys[0].value
             except Exception as e:
                 raise e
-                raise ex
 
     def get_client_lazy(self):
         # only import if method is used
