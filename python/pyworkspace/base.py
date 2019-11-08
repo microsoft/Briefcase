@@ -19,25 +19,27 @@ class Resource(yaml.YAMLObject):
     yaml_loader = yaml.SafeLoader
 
     def get_logger(self):
-        if not hasattr(self, '_logger'):
-            self._logger = logging.getLogger('workspace')
-        
-        return self._logger
+        return self.__logger
 
     def update_child(self, child):
-        child.__workspace = self.__workspace
+        child.init(self.__workspace, '', '')
+        
         child.__names = self.__names
         # TODO: probably searching up the path is a better choice?
-        if hasattr(self, 'credentialstore'):
-            child.credentialstore = self.credentialstore
+        child.credentialstore = self.credentialstore
             
         return child
 
-    def add_name(self, workspace, path, name: str):
-        self.__workspace = workspace
+    def init(self, workspace, path, name: str):
+        # avoid duplicate initialize
+        if '_Resource__workspace' in self.__dict__:
+            return
 
-        if not hasattr(self, '_Resource__names'):
-            self.__names = set()
+        self.__logger = logging.getLogger('workspace')
+        self.__names = set()
+        self.__client = None
+
+        self.__workspace = workspace
 
         self.__names.add(name)
         self.__names.add('.'.join([*path, name]))
@@ -64,17 +66,18 @@ class Resource(yaml.YAMLObject):
 
         # 1. check credentials attribute
         # 1a. find all credential stores (sort alphabetical)
-        if hasattr(self, 'credentialstore') and self.credentialstore is not None:
+        if 'credentialstore' in self.__dict__:
             return [self.credentialstore]
         else:
-            from .credentialprovider import CredentialProvider, EnvironmentCredentialProvider
+            from .credentialprovider import CredentialProvider, EnvironmentCredentialProvider, DotEnvCredentialProvider
             from .python.keyring import KeyRingCredentialProvider
             from .python.jupyterlab_credentialstore import JupyterLabCredentialStore
 
             return [  # *self.get_workspace().get_all_of_type(CredentialProvider),
                 JupyterLabCredentialStore(),
                 KeyRingCredentialProvider(),
-                EnvironmentCredentialProvider()]
+                EnvironmentCredentialProvider(),
+                DotEnvCredentialProvider(self.get_workspace().get_env())]
 
     def get_names(self) -> Set[str]:
         return self.__names
@@ -83,12 +86,14 @@ class Resource(yaml.YAMLObject):
         return self.__workspace
 
     def get_secret(self, **kwargs) -> str:
+        return self.__get_secret(self.get_names(), **kwargs)
+
+    def __get_secret(self, names: List[str], **kwargs) -> str:
         # rules to resolve
         # 3. resolve key by name
-        # 3a. resolve key by path + name (. seperated)
+        # 3a. resolve key by path + name (. seperated) 
 
-        providers = self.get_credentials_providers()
-        names = self.get_names()
+        providers = self.get_credentials_providers()    
 
         # try all credential provides first
         for provider in providers:
@@ -103,15 +108,31 @@ class Resource(yaml.YAMLObject):
         raise KeyNotFoundException(
             "Secret not found for keys {} not found".format(names))
 
+    def __getattr__(self, name):
+        # print('__getattr__ {}'.format(name))
+
+        # used by pyyaml
+        if name == '__setstate__':
+            raise AttributeError()
+
+        try:
+            return self.__get_secret(list(map(lambda n: '{}.{}'.format(n, name), self.get_names())))
+        except KeyNotFoundException:
+            raise AttributeError()
+
+    # used for test injection
+    def set_client(self, client):
+        self.__client = client
+
     def get_client(self):
-        if not hasattr(self, 'client'):
+        if self.__client is None:
             lazy_init = getattr(self, "get_client_lazy")
             if not callable(lazy_init):
                 raise Exception("get_client_lazy must be a method")
 
-            self.client = self.get_client_lazy()
+            self.__client = self.get_client_lazy()
 
-        return self.client
+        return self.__client
 
 
 class KeyNotFoundException(Exception):

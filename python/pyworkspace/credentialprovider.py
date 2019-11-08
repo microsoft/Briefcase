@@ -1,5 +1,5 @@
 from .base import *
-
+import os
 
 class CredentialProvider(Resource):
     def get_secret(self, key, **kwargs):
@@ -18,3 +18,10 @@ class EnvironmentCredentialProvider(CredentialProvider):
 
     def get_secret(self, key, **kwargs):
         return os.environ.get(key)
+
+class DotEnvCredentialProvider(CredentialProvider):
+    def __init__(self, env):
+        self.env = env
+
+    def get_secret(self, key, **kwargs):
+        return self.env[key] if key in self.env else None

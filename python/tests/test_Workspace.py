@@ -37,7 +37,7 @@ def test_Credential_Resolution(test_subdir):
 
     # make sure we don't call out to keyvault in tests
     for keyvault in ws.get_all_of_type(pyworkspace.azure.AzureKeyVault):
-        keyvault.client = MockKeyVault()
+        keyvault.set_client(MockKeyVault())
 
     # mock keyvault appends 123 at the end
     # explicit credential store reference

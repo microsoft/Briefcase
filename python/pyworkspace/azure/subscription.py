@@ -29,7 +29,7 @@ class AzureSubscription(AzureResource):
             # TODO: resolve configured msi
             auth = self.get_auth_client()
             if auth is not None:
-                self.logger.debug('auth client found: {}. auto-discovering Azure subscriptions'.format(auth.__class__.__name__))
+                self.get_logger().debug('auth client found: {}. auto-discovering Azure subscriptions'.format(auth.__class__.__name__))
                 try:
                     # let's try to enumerate subscriptions
                     from azure.mgmt.subscription import SubscriptionClient
@@ -38,9 +38,9 @@ class AzureSubscription(AzureResource):
                     ret.extend(map(lambda s: s.subscription_id,
                                    subscription_client.subscriptions.list()))
                 except Exception as e:
-                    self.logger.debug('unable to auto-resolve Azure subscriptions as no auth_client found {}'.format(e))
+                    self.get_logger().debug('unable to auto-resolve Azure subscriptions as no auth_client found {}'.format(e))
                     pass
             else:
-                self.logger.debug('unable to auto-resolve Azure subscriptions as no auth_client found')
+                self.get_logger().debug('unable to auto-resolve Azure subscriptions as no auth_client found')
 
         return ret

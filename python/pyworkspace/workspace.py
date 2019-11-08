@@ -10,6 +10,7 @@ from .base import *
 from .datasource import *
 from .credentialprovider import *
 from .python import *
+from dotenv import dotenv_values
 
 class Workspace:
     def __init__(self, path: str = None, content: str = None):
@@ -29,6 +30,14 @@ class Workspace:
 
         self.__parse(content)
         self.globals = {}
+
+        # load the .env next to the found .yaml
+        dot_env_path = os.path.join(os.path.dirname(os.path.abspath(path)), '.env')
+        self.logger.debug('.env: {}'.format(dot_env_path))
+        self.__env = dotenv_values(dot_env_path)
+
+    def get_env(self) -> Dict[str, str]:
+        return self.__env
 
     def __find_yaml(self, path) -> str:
         path = os.path.realpath(path)
@@ -67,7 +76,7 @@ class Workspace:
         def setup_links(node, path, name):
             # make sure we don't overwrite path/name from a reference usage (e.g. *foo)
             # &foo needs to come before *foo
-            node.add_name(self, path, name)
+            node.init(self, path, name)
 
         # setup root links to avoid back reference to credential provider
         self.visit(setup_links)
