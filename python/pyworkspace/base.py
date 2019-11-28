@@ -2,6 +2,7 @@ import os
 import re
 import yaml
 import logging
+import timeit
 
 from typing import Dict, List, Set, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -30,6 +31,14 @@ class Resource(yaml.YAMLObject):
             
         return child
 
+    def get_mapped_name(self, name: str):
+        """
+        Resource secrets name can be remapped using the name: property.
+        """
+        # check if name: property exists
+        # check if name key in property exists
+        return self.name[name] if 'name' in self.__dict__ and name in self.name else None
+
     def init(self, workspace, path, name: str):
         # avoid duplicate initialize
         if '_Resource__workspace' in self.__dict__:
@@ -41,6 +50,12 @@ class Resource(yaml.YAMLObject):
 
         self.__workspace = workspace
 
+        # check if we have name mapping
+        mapping = self.get_mapped_name('secret')
+        if not mapping is None:
+            self.__names.add(mapping)
+
+        # TODO: what's the preferred behavior. try as much as possible?
         self.__names.add(name)
         self.__names.add('.'.join([*path, name]))
 
@@ -116,7 +131,17 @@ class Resource(yaml.YAMLObject):
             raise AttributeError()
 
         try:
-            return self.__get_secret(list(map(lambda n: '{}.{}'.format(n, name), self.get_names())))
+            mapped = self.get_mapped_name(name)
+            if not mapped is None:
+                # for the default secret we probe all options. should do the same here?
+                value = self.__get_secret([mapped])
+            else:
+                value = self.__get_secret(list(map(lambda n: '{}.{}'.format(n, name), self.get_names())))
+
+            # cache for next time
+            self.__dict__[name] = value
+
+            return value
         except KeyNotFoundException:
             raise AttributeError()
 
@@ -130,7 +155,16 @@ class Resource(yaml.YAMLObject):
             if not callable(lazy_init):
                 raise Exception("get_client_lazy must be a method")
 
-            self.__client = self.get_client_lazy()
+            start_time = timeit.default_timer()
+
+            try:
+                # invoke sub-class
+                self.__client = self.get_client_lazy()
+            except ImportError as error:
+                raise Exception("Failed to import {}. Try installing '{}'".format(error, self.pip_package))
+
+            elapsed = timeit.default_timer() - start_time
+            self.get_logger().debug("created client ({:.1f} sec): {}".format(elapsed, type(self).__name__))
 
         return self.__client
 

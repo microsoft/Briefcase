@@ -4,8 +4,10 @@ import re
 import yaml
 import logging
 
-# TODO: check if the imports are needed
 from .azure import *
+from .aws import *
+from .google import *
+from .clarifai import *
 from .base import *
 from .datasource import *
 from .credentialprovider import *

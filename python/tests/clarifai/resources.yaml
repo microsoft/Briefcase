@@ -1,0 +1,16 @@
+myserviceprincipal2: &myserviceprincipal2
+  !azure.serviceprincipal
+  # clientid: 
+  tenantid: 72f988bf-86f1-41af-91ab-2d7cd011db47 
+
+kv1: &kv1
+  !azure.keyvault
+  # w/o value this creates None. Maybe all props should be looked using a method?
+  # dnsname: 
+  credential: *myserviceprincipal2
+
+moderation:
+  !clarifai.app
+  credentialstore: *kv1
+  name:
+    secret: Clarafai-API-Key
