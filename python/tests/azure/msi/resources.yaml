@@ -1,0 +1,3 @@
+workspacetest1:
+  !azure.storage.blob
+  url: https://workspacetest.blob.core.windows.net/test/test.csv

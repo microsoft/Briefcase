@@ -31,8 +31,8 @@ setup(name='pyworkspace',
       python_requires='>=3',
       install_requires=['pyyaml', 'python-dotenv'],
       extras_require={
-          'test': ['azureml-dataprep[pandas]',
-                   'azure-keyvault',
+          'test': [# 'azureml-dataprep[pandas]', # unable to install
+                   'azure-keyvault==1.1.0',
                    'azure-storage-blob',
                    'azure-mgmt-storage',
                    'azure-mgmt-subscription',
