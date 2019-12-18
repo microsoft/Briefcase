@@ -1,5 +1,5 @@
 parameters:
-  pythonVersions: ["3.7", "3.6", "3.5"] #, "2.7"]
+  pythonVersions: ["3.7", "3.6"]
   operatingSystems: ["ubuntu-16.04", 'macos-10.13', 'vs2017-win2016']
 
 jobs:
@@ -33,6 +33,9 @@ jobs:
     displayName: 'Python Unit Tests'
     env:
       myserviceprincipal1: $(test_service_principal_secret)
+      myserviceprincipal2: $(test_service_principal_secret2)
+      myserviceprincipal2.clientid: $(test_service_principal_clientid2)
+      kv1.dnsname: $(test_keyvault_dns)
 
   - task: PublishTestResults@2
     condition: succeededOrFailed()

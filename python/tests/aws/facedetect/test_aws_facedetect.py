@@ -16,7 +16,7 @@ def test_aws_facedetect(test_subdir, caplog):
 
 	ws = pyworkspace.Workspace()
 
-	image = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../face1.jpg'), "rb").read() 
+	image = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../face1.jpg'), "rb").read() 
 
 	reko_client = ws['faceaws1'].get_client()
 	

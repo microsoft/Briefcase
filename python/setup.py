@@ -31,7 +31,7 @@ setup(name='pyworkspace',
       python_requires='>=3',
       install_requires=['pyyaml', 'python-dotenv'],
       extras_require={
-          'test': [# 'azureml-dataprep[pandas]', # unable to install
+          'test': ['azureml-dataprep[pandas]', 
                    'azure-keyvault==1.1.0',
                    'azure-storage-blob',
                    'azure-mgmt-storage',
@@ -44,6 +44,7 @@ setup(name='pyworkspace',
                    'google-cloud-videointelligence',
                    'clarifai',
                    'sqlalchemy',
+                   'pandas',
                    'keyring',
                    'keyrings.alt',  # not recommended for production
                    'secretstorage',

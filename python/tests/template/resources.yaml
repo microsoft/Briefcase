@@ -1,0 +1,35 @@
+myserviceprincipal: &myserviceprincipal
+  !azure.serviceprincipal
+  # clientid: 
+  tenantid: 72f988bf-86f1-41af-91ab-2d7cd011db47 
+
+# TODO: how about a default credential store?! or just search all available ones...
+# auto-resolve properties based on types if not set (e.g. resource group)
+mykeyvault: &kv1
+  # dnsname: 
+  credential: *myserviceprincipal2
+
+workspacetest2: &workspacetest1
+  !azure.storage.account
+  # accountname: 
+  credentialstore: *myvault1
+ 
+azurevision:
+  !azure.cognitiveservice.face
+  credentialstore: *myvault1
+
+  # alternative is to use ARM directly 
+  # terraform doesn't support AML e.g. https://github.com/terraform-providers/terraform-provider-azurerm/issues/3729
+  terraform:
+    sku:
+      name: S1
+      # tier: Standard
+      # location: West US
+
+azuretext:
+  !azure.cognitiveservice.textanalytics
+  credentialstore: *myvault1
+
+awsreko:
+  !aws.rekognition
+  credentialstore: *myvault1

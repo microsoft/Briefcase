@@ -127,26 +127,21 @@ class AzureBlob(URLDataSource):
         if self.datasource.is_secret_a_sas_token():
             sas_token = self.datasource.get_secret()
         else:
-            from azure.storage.blob.sharedaccesssignature import BlobSharedAccessSignature
-            from azure.storage.blob.models import ContainerPermissions
+            from azure.storage.blob import generate_blob_sas, BlobSasPermissions
 
             # could also get SAS on the fly by getting ADAL context: https://github.com/Azure/azure-storage-python/blob/master/azure-storage-blob/azure/storage/blob/sharedaccesssignature.py
-            sas = BlobSharedAccessSignature(
-                self.datasource.accountname, account_key=self.datasource.get_secret())
-
             now = datetime.datetime.utcnow()
-            sas_token = sas.generate_blob(
+            sas_token = generate_blob_sas(
+                self.datasource.accountname,
                 self.containername,
                 self.path,
-                permission=ContainerPermissions(
-                    read=True),  # TODO: maybe write?
-                # this feels like trouble
-                start=now - datetime.timedelta(hours=1),
+                account_key=self.datasource.get_secret(),
+                permission=BlobSasPermissions(read=True),
                 expiry=now + datetime.timedelta(hours=12))
 
         # TODO: secure vs non-secure
         # other clouds
-        # TODO: urllib has path join method including encoding
+        # TODO: urllib has path join method including 
         return "https://{}.blob.core.windows.net/{}/{}?{}".format(
             self.datasource.accountname,
             self.containername,

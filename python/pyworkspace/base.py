@@ -88,11 +88,13 @@ class Resource(yaml.YAMLObject):
             from .python.keyring import KeyRingCredentialProvider
             from .python.jupyterlab_credentialstore import JupyterLabCredentialStore
 
-            return [  # *self.get_workspace().get_all_of_type(CredentialProvider),
+            return [
                 JupyterLabCredentialStore(),
                 KeyRingCredentialProvider(),
                 EnvironmentCredentialProvider(),
-                DotEnvCredentialProvider(self.get_workspace().get_env())]
+                DotEnvCredentialProvider(self.get_workspace().get_env()),
+                # include credential providers as well
+                *self.get_workspace().get_all_of_type(CredentialProvider)]
 
     def get_names(self) -> Set[str]:
         return self.__names
