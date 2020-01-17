@@ -12,11 +12,11 @@ mykeyvault: &kv1
 workspacetest2: &workspacetest1
   !azure.storage.account
   # accountname: 
-  credentialstore: *myvault1
+  credentialprovider: *myvault1
  
 azurevision:
   !azure.cognitiveservice.face
-  credentialstore: *myvault1
+  credentialprovider: *myvault1
 
   # alternative is to use ARM directly 
   # terraform doesn't support AML e.g. https://github.com/terraform-providers/terraform-provider-azurerm/issues/3729
@@ -28,8 +28,8 @@ azurevision:
 
 azuretext:
   !azure.cognitiveservice.textanalytics
-  credentialstore: *myvault1
+  credentialprovider: *myvault1
 
 awsreko:
   !aws.rekognition
-  credentialstore: *myvault1
+  credentialprovider: *myvault1

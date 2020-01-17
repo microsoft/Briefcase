@@ -9,8 +9,14 @@ kv1: &kv1
   # dnsname: 
   credential: *myserviceprincipal2
 
-moderation:
-  !clarifai.app
-  credentialstore: *kv1
+face:
+  !google.vision
+  credentialprovider: *kv1
   name:
-    secret: Clarafai-API-Key
+    secret: google-vision-key
+
+language:
+  !google.language
+  credentialprovider: *kv1
+  name:
+    secret: GOOGLE-NER-KEY

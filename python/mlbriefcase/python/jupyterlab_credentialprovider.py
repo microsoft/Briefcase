@@ -1,8 +1,8 @@
 from ..credentialprovider import CredentialProvider
 
 # https://towardsdatascience.com/the-jupyterlab-credential-store-9cc3a0b9356 
-class JupyterLabCredentialStore(CredentialProvider):
-    yaml_tag = u'!python.jupyter.credentialstore'
+class JupyterLabCredentialProvider(CredentialProvider):
+    yaml_tag = u'!python.jupyter.credentialprovider'
     def get_secret(self, key, **kwargs):
         try:
             import kernel_connector as kc

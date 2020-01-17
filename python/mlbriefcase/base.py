@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class Resource(yaml.YAMLObject):
-    """The base class for resources referenced from resources.yaml
+    """The base class for resources referenced from briefcase.yaml
     """
     yaml_tag = u'!resource'
     
@@ -27,7 +27,7 @@ class Resource(yaml.YAMLObject):
         
         child.__names = self.__names
         # TODO: probably searching up the path is a better choice?
-        child.credentialstore = self.credentialstore
+        child.credentialprovider = self.credentialprovider
             
         return child
 
@@ -69,7 +69,7 @@ class Resource(yaml.YAMLObject):
         Returns:
             Configuration options.
         """
-        # TODO: filter credentialstore or change to _?
+        # TODO: filter credentialprovider or change to _?
         return {k: v for k, v in self.__dict__.items()
                 if not (k.startswith('_') or k in exclude)}
 
@@ -81,15 +81,15 @@ class Resource(yaml.YAMLObject):
 
         # 1. check credentials attribute
         # 1a. find all credential stores (sort alphabetical)
-        if 'credentialstore' in self.__dict__:
-            return [self.credentialstore]
+        if 'credentialprovider' in self.__dict__:
+            return [self.credentialprovider]
         else:
             from .credentialprovider import CredentialProvider, EnvironmentCredentialProvider, DotEnvCredentialProvider
             from .python.keyring import KeyRingCredentialProvider
-            from .python.jupyterlab_credentialstore import JupyterLabCredentialStore
+            from .python.jupyterlab_credentialprovider import JupyterLabCredentialProvider
 
             return [
-                JupyterLabCredentialStore(),
+                JupyterLabCredentialProvider(),
                 KeyRingCredentialProvider(),
                 EnvironmentCredentialProvider(),
                 DotEnvCredentialProvider(self.get_workspace().get_env()),
@@ -99,7 +99,7 @@ class Resource(yaml.YAMLObject):
     def get_names(self) -> Set[str]:
         return self.__names
 
-    def get_workspace(self) -> 'Workspace':
+    def get_workspace(self) -> 'Briefcase':
         return self.__workspace
 
     def get_secret(self, **kwargs) -> str:
@@ -111,19 +111,29 @@ class Resource(yaml.YAMLObject):
         # 3a. resolve key by path + name (. seperated) 
 
         providers = self.get_credentials_providers()    
+        try:
+            # try all credential provides first
+            for provider in providers:
+                # make sure we don't use the same provider twice
+                if 'get_secret_lock' in provider.__dict__:
+                    continue
+                provider.get_secret_lock = True
+                
+                for key in names:
+                    self.get_logger().debug("secret probing: {} for {} ...".format(provider.__class__.__name__, key))
+                    secret = provider.get_secret(key, **kwargs)
+        
+                    if secret is not None:
+                        self.get_logger().debug("secret found:  {} {}".format(provider.__class__.__name__, key))
+                        return secret
+        finally:
+            for provider in providers:
+                provider.__dict__.pop('get_secret_lock', None)
 
-        # try all credential provides first
-        for provider in providers:
-            for key in names:
-                self.get_logger().debug("secret probing: {} for {} ...".format(provider.__class__.__name__, key))
-                secret = provider.get_secret(key, **kwargs)
-
-                if secret is not None:
-                    self.get_logger().debug("secret found:  {} {}".format(provider.__class__.__name__, key))
-                    return secret
-
+        # contain probed provider names in exception
+        provider_names = map(lambda p: p.__class__.__name__, providers)
         raise KeyNotFoundException(
-            "Secret not found for keys {} not found".format(names))
+            "Secret not found for keys {} not found in {}".format(names, ", ".join(provider_names)))
 
     def __getattr__(self, name):
         # print('__getattr__ {}'.format(name))

@@ -1,4 +1,4 @@
-import pyworkspace
+import mlbriefcase
 import keyring
 import os
 import pytest
@@ -14,7 +14,7 @@ def test_subdir():
                     reason='Environment variable myserviceprincipal1 must be set to service principals secret')
 def test_service_principal(test_subdir):
 
-    ws = pyworkspace.Workspace()
+    ws = mlbriefcase.Briefcase()
 
     svc1 = ws['myvault1']
     assert len(svc1.get_secret("workspacetest1")) > 0
@@ -23,7 +23,7 @@ def test_service_principal(test_subdir):
 @pytest.mark.skipif(os.environ.get('myserviceprincipal1') is None,
                     reason='Environment variable myserviceprincipal1 must be set to service principals secret')
 def test_service_csv1(test_subdir):
-    ws = pyworkspace.Workspace()
+    ws = mlbriefcase.Briefcase()
 
     df = ws['csv1'].to_pandas_dataframe()
     assert (df.columns == ['a', 'b', 'c']).all()

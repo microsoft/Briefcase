@@ -16,7 +16,7 @@ myvault1: &myvault1
 workspacetest1: &workspacetest1
   !azure.storage.account
   accountname: workspacetest
-  # credentialstore: *myvault1 # auto-resolve
+  # credentialprovider: *myvault1 # auto-resolve
   
 csv1:
   !csv

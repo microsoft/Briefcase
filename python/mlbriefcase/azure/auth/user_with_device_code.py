@@ -56,8 +56,6 @@ class AzureUserWithDeviceLogin(Resource):
         return self.get_client_for_resource()
     
     def get_client_for_resource(self, resource='https://management.core.windows.net/'):
-        
-        print('user device foo')
         import adal
         from msrestazure.azure_active_directory import AADTokenCredentials
 

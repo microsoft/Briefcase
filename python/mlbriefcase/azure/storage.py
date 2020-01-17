@@ -9,10 +9,10 @@ from .azure_resource import AzureResource
 class AzureStorage(AzureResource):
     yaml_tag = u'!azure.storage.account'
 
-    def __init__(self, accountname, accountkey=None, credentialstore=None):
+    def __init__(self, accountname, accountkey=None, credentialprovider=None):
         self.accountname = accountname
         self.accountkey = accountkey
-        self.credentialstore = credentialstore
+        self.credentialprovider = credentialprovider
 
     def get_secrettype(self) -> str:
         if not 'secrettype' in self.__dict__:

@@ -1,4 +1,4 @@
-import pyworkspace
+import mlbriefcase
 import keyring
 import os
 import pytest
@@ -8,16 +8,16 @@ def test_subdir():
     # change to tests/ subdir so we can resolve the yaml
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-def test_Workspace_can_load(test_subdir):
-    ws = pyworkspace.Workspace()
+def test_Briefcase_can_load(test_subdir):
+    ws = mlbriefcase.Briefcase()
 
-def test_Workspace_can_find_AzureStorage(test_subdir):
-    ws = pyworkspace.Workspace()
+def test_Briefcase_can_find_AzureStorage(test_subdir):
+    ws = mlbriefcase.Briefcase()
 
-    assert 0 < len(ws.get_all_of_type(pyworkspace.azure.AzureStorage))
+    assert 0 < len(ws.get_all_of_type(mlbriefcase.azure.AzureStorage))
 
-def test_Workspace_indexing(test_subdir):
-    ws = pyworkspace.Workspace()
+def test_Briefcase_indexing(test_subdir):
+    ws = mlbriefcase.Briefcase()
 
     assert ws['credentials/myvault1'] is not None
     assert ws['credentials.myvault1'] is not None
@@ -33,10 +33,10 @@ class MockKeyVault():
          return MockKeyVaultSecret('123')
 
 def test_Credential_Resolution(test_subdir):
-    ws = pyworkspace.Workspace()
+    ws = mlbriefcase.Briefcase()
 
     # make sure we don't call out to keyvault in tests
-    for keyvault in ws.get_all_of_type(pyworkspace.azure.AzureKeyVault):
+    for keyvault in ws.get_all_of_type(mlbriefcase.azure.AzureKeyVault):
         keyvault.set_client(MockKeyVault())
 
     # mock keyvault appends 123 at the end
@@ -46,16 +46,16 @@ def test_Credential_Resolution(test_subdir):
     # assert '123' == ws['myblobsource2'].get_secret() 
 
 def test_e2e_storage_pandas(test_subdir):
-    ws = pyworkspace.Workspace()
+    ws = mlbriefcase.Briefcase()
 
     df = ws['csv1'].to_pandas_dataframe()
     assert (df.columns == ['a', 'b', 'c']).all()
     assert df.shape == (2, 3)
 
 def test_cog_service_keyring(test_subdir):
-    ws = pyworkspace.Workspace()
+    ws = mlbriefcase.Briefcase()
 
-    keyring.set_password('pyworkspace', 'anom1', 'abc123')
+    keyring.set_password('mlbriefcase', 'anom1', 'abc123')
 
     svc1 = ws['anom1']
     

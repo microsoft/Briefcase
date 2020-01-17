@@ -6,7 +6,7 @@ credentials:
 
  # TODO: add support for unknown types
  #  armprovider:
- #   !azure.arm.credentialstore
+ #   !azure.arm.credentialprovider
  #   tenantid: 123a-234a
 
 datasources: # just convention, support arbitrary structure
@@ -14,7 +14,7 @@ datasources: # just convention, support arbitrary structure
     myblobsource1: &myblobsource1 
       !azure.storage.account
       accountname: webscaleai
-      credentialstore: *myvault1
+      credentialprovider: *myvault1
 
     myblobsource2: &myblobsource2 
       !azure.storage.account
@@ -79,7 +79,7 @@ services:
     anom1:
       # semantic hierarchy organizing resources (-> MLSpec)
       !azure.cognitiveservice.anomalydetection
-      credentialstore: 
+      credentialprovider: 
         !python.keyring
         foo: 1 # TODO: not sure why I need at least 1 property?
       url: https://foo.bar

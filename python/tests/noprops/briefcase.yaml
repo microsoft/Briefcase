@@ -1,0 +1,14 @@
+myserviceprincipal: &myserviceprincipal
+  !azure.serviceprincipal
+  name:
+    clientid: ABC
+    tenantid: DEF
+
+kv1: &kv1
+  !azure.keyvault
+  dnsname: https://nonexisting.vault.azure.net/
+  credential: *myserviceprincipal
+
+face_test:
+  !azure.cognitiveservice.face
+  url: https://westus.api.cognitiveservice.microsoft.com/face/v1.0/detect?

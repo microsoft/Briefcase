@@ -1,4 +1,4 @@
-import pyworkspace
+import mlbriefcase
 import pytest
 import os
 
@@ -8,7 +8,7 @@ def test_subdir():
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 def test_dotenv(test_subdir):
-    ws = pyworkspace.Workspace()
+    ws = mlbriefcase.Briefcase()
 
     # resolve from .env file
     assert ws['dummy1'].get_secret() == 'secret1'

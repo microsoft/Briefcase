@@ -14,7 +14,7 @@ from .credentialprovider import *
 from .python import *
 from dotenv import dotenv_values
 
-class Workspace:
+class Briefcase:
     def __init__(self, path: str = None, content: str = None):
         self.logger = logging.getLogger('workspace')
         # TODO: think about multiple yamls and when to actually stop
@@ -46,13 +46,13 @@ class Workspace:
 
         for name in os.listdir(path):
             # TODO: allow for different name. global param? ctor param?
-            if name == 'resources.yaml':
+            if name == 'briefcase.yaml':
                 return os.path.join(path, name)
 
         # going up the directory structure
         new_path = os.path.realpath(os.path.join(path, '..'))
         if path == new_path:  # hit the root
-            raise Exception("Unable to find resources.yaml")
+            raise Exception("Unable to find briefcase.yaml")
 
         return self.__find_yaml(new_path)
 
@@ -73,6 +73,10 @@ class Workspace:
         SafeLoaderIgnoreUnknown.add_constructor(
             None, SafeLoaderIgnoreUnknown.ignore_unknown)
         self.resources = yaml.load(content, Loader=SafeLoaderIgnoreUnknown)
+
+        # support empty file
+        if self.resources is None:
+            return
 
         # visit all nodes and setup links
         def setup_links(node, path, name):
@@ -108,6 +112,7 @@ class Workspace:
               action: Callable[[yaml.YAMLObject, List[str], str], Any],
               path: List[str] = [],
               node: Any = None) -> List:
+
         if node is None:
             node = self.resources
 
@@ -140,7 +145,7 @@ class Workspace:
         return self.globals[key]
     
     def __getitem__(self, key: str) -> Union[Resource, List[Resource]]:
-        path = Workspace.key_split_regex.split(key)
+        path = Briefcase.key_split_regex.split(key)
 
         if len(path) == 1:
             # search all

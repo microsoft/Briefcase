@@ -9,10 +9,10 @@ here = path.abspath(path.dirname(__file__))
 # with open(path.join(here, '..', 'README.md'), encoding='utf-8') as f:
 #    long_description = f.read()
 
-setup(name='pyworkspace',
+setup(name='mlbriefcase',
       version='0.1',
       description='Manages your cloud resources across multiple executing environments.',
-      url='http://github.com/Microsoft/Workspace',
+      url='http://github.com/Microsoft/Briefcase',
       author='Markus Cozowicz',
       author_email='marcozo@microsoft.com',
       classifiers=[
@@ -36,6 +36,7 @@ setup(name='pyworkspace',
                    'azure-storage-blob',
                    'azure-mgmt-storage',
                    'azure-mgmt-subscription',
+                   'azure-cognitiveservices-vision-face',
                    'boto3',
                    'google-auth',
                    'google-cloud',

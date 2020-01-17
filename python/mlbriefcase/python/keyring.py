@@ -7,8 +7,8 @@ class KeyRingCredentialProvider(CredentialProvider):
             # conditional import
             import keyring
 
-            # TODO: unclear if pyworkspace is good value here
+            # TODO: unclear if mlbriefcase is good value here
             # see https://pypi.org/project/keyring/#api-interface
-            return keyring.get_password('pyworkspace', key)
+            return keyring.get_password('mlbriefcase', key)
         except:
             return None

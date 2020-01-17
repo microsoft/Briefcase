@@ -1,4 +1,4 @@
-import pyworkspace
+import mlbriefcase
 import pytest
 import os
 import json
@@ -15,7 +15,7 @@ def test_subdir():
 def test_clarifai_moderation(test_subdir, caplog):
 	caplog.set_level(logging.DEBUG, logger='workspace')
 
-	ws = pyworkspace.Workspace()
+	ws = mlbriefcase.Briefcase()
 
 	client = ws['moderation'].get_client()
 	

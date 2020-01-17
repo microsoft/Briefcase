@@ -16,4 +16,4 @@ myvault1: &myvault1
 workspacetest1:
   !azure.storage.blob
   url: https://workspacetest.blob.core.windows.net/test/test.csv
-  credentialstore: *myvault1
+  credentialprovider: *myvault1

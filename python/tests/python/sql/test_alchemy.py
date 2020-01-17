@@ -1,4 +1,4 @@
-import pyworkspace
+import mlbriefcase
 import pytest
 import os
 
@@ -8,7 +8,7 @@ def test_subdir():
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 def test_sql_alchemy(test_subdir):
-    ws = pyworkspace.Workspace()
+    ws = mlbriefcase.Briefcase()
 
     # os.remove('deleteme_test_alchemy.db')
 

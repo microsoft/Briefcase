@@ -1,4 +1,4 @@
-import pyworkspace
+import mlbriefcase
 import pytest
 import os
 import json
@@ -14,7 +14,7 @@ def test_subdir():
 def test_aws_facedetect(test_subdir, caplog):
 	caplog.set_level(logging.DEBUG, logger='workspace')
 
-	ws = pyworkspace.Workspace()
+	ws = mlbriefcase.Briefcase()
 
 	image = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../face1.jpg'), "rb").read() 
 
