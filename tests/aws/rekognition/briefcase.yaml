@@ -1,0 +1,17 @@
+azure:
+  auth:
+    serviceprincipal:
+      - name: myserviceprincipal1
+        tenantid: 72f988bf-86f1-41af-91ab-2d7cd011db47 
+    
+  keyvault:
+    - name: myvault1
+      credential: myserviceprincipal1
+
+amazon:
+  rekognition:
+    - name: vision
+      region_name: west_us
+
+    - name: face
+      region_name: west_us

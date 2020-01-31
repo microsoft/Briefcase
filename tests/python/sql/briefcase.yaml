@@ -1,0 +1,4 @@
+python:
+  sqlalchemy:
+    - name: query1
+      drivername: sqlite

@@ -1,7 +1,0 @@
-dataset:
-    !azure.storage.blob
-    containername: test
-    path: test.csv
-    datasource:
-        !azure.storage.account
-        accountname: workspacetest

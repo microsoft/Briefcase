@@ -1,0 +1,26 @@
+azure:
+  auth:
+    serviceprincipal:
+      - name: myserviceprincipal2
+        tenantid: 72f988bf-86f1-41af-91ab-2d7cd011db47 
+
+  keyvault:
+    - name: kv1
+      credential: myserviceprincipal2
+  
+
+amazon:
+  rekognition:
+    - name: faceaws1
+      region_name: "us-east-1"
+      key_id:
+        key: AWS-ACCESS-KEY
+      secret:
+        key: AWS-SECRET-KEY
+
+    - name: visionaws1
+      region_name: "us-west-2"
+      key_id:
+        key: AWS-ACCESS-KEY
+      secret:
+        key: AWS-SECRET-KEY

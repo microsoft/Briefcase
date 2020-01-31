@@ -1,0 +1,35 @@
+azure:
+  keyvault:
+    - name: myvault1
+      dnsname: https://webscaleai.vault.azure.net/
+      tenantid: 72f988bf-86f1-41af-91ab-2d7cd011db47
+  
+  storage:
+    account:
+      - name: myblobsource1
+        accountname: webscaleai
+        credentialprovider: myvault1
+      - name: myblobsource2
+        accountname: storage2
+        secrettype: sas
+  
+    blob:
+      - name: criteo_day0
+        account: myblobsource1
+        containername: criteo
+        path: 1_csv/day_0.gz
+
+      - name: criteo_all_days
+        account: myblobsource1
+        containername: criteo
+        path: 1_csv/*gz 
+
+  cognitiveservice:
+    anomalydetection:
+      - name: anom1
+        url: https://foo.bar
+
+python:
+  sqlalchemy:
+    - name: sqlalchemy
+      url: postgresql://scott:$secret$@localhost:5432/mydatabase

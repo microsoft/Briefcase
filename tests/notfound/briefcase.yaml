@@ -1,0 +1,16 @@
+azure:
+  auth:
+    serviceprincipal:
+      - name: myserviceprincipal
+        clientid: 4fa7a034-7d43-4a57-931b-69cd9935d14a
+        tenantid: 2d68b794-ff91-43cc-b789-05c48e0a9f8f
+    
+  keyvault:
+    - name: kv1
+      dnsname: https://nonexisting.vault.azure.net/
+      credential: myserviceprincipal
+
+  cognitiveservice:
+    face:
+      - name: face_test
+        url: https://westus.api.cognitiveservice.microsoft.com/face/v1.0/detect?

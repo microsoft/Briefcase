@@ -1,0 +1,21 @@
+azure:
+  auth:
+    serviceprincipal:
+      - name: myserviceprincipal2
+        tenantid: 72f988bf-86f1-41af-91ab-2d7cd011db47 
+
+  keyvault:
+    - name: kv1
+      credential: myserviceprincipal2
+ 
+google:
+  vision:
+    - name: face
+      credentialprovider: kv1
+      secret:
+        key: google-vision-key
+
+  language:
+    - name: language
+      secret:
+        key: GOOGLE-NER-KEY

@@ -2,15 +2,6 @@
 [![Build Status](https://dev.azure.com/ossworkspace/Workspace/_apis/build/status/Microsoft.Workspace%20Python?branchName=master)](https://dev.azure.com/ossworkspace/Workspace/_build/latest?definitionId=1&branchName=master)
 Python
 
-[![Build Status](https://dev.azure.com/ossworkspace/Workspace/_apis/build/status/Microsoft.Workspace%20DotNet%20Core?branchName=master)](https://dev.azure.com/ossworkspace/Workspace/_build/latest?definitionId=3&branchName=master)
-.NET Core
-
-[![Build Status](https://dev.azure.com/ossworkspace/Workspace/_apis/build/status/Microsoft.Workspace%20DotNet%20Desktop?branchName=master)](https://dev.azure.com/ossworkspace/Workspace/_build/latest?definitionId=2&branchName=master)
-.NET Desktop
-
-[![Build Status](https://dev.azure.com/ossworkspace/Workspace/_apis/build/status/Microsoft.Workspace%20TypeScript?branchName=master)](https://dev.azure.com/ossworkspace/Workspace/_build/latest?definitionId=4&branchName=master)
-TypeScript
-
 # Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
@@ -24,6 +15,151 @@ provided by the bot. You will only need to do this once across all repos using o
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+# What is this? (TODO)
+This projects provides an abstraction layer between secrets and services by externalizing the configuration using yaml.
+In constrast to other config libraries the library returns fully-configured and authenticated client SDK objects for services.
+Secrets can be fetched from a number of sources.
+It's expected that the briefcase.yaml is stored along side notebooks (e.g. in the root folder of a git repository). 
+
+## Example: Azure Blob and Environment Variable
+Accessing private blobs is usually performed using SAS tokens or by sharing account keys.
+
+```bash
+pip install mlbriefcase
+```
+
+Create briefcase.yaml
+```yaml
+azure:
+    storage:
+        blob:
+            -name: blob1
+             url: https://myblob123.blob.core.windows.net/test/test.csv
+```
+
+```bash
+export blob1=<TODO insert KEY START...>
+```
+
+```python
+import mlbriefcase
+import pandas as pd
+
+# searches for briefcase.yaml in current directory and all parent directories
+briefcase = mlbriefcase.Briefcase()
+
+# let's get the resource by name
+blob = briefcase['blob1']
+
+# Performs
+# - probe credential providers (e.g. environment variable, dotenv, ...) to find storage account key
+# - create Azure Storage SDK object (available through blob.get_client())
+# - generated authenticated url using SAS token
+url = blob.get_url()  
+
+df = pd.read_csv(url, sep='\t')
+``` 
+
+## Example: Azure Cognitive Vision Service and .env file
+
+This example demonstrate how to get the Azure Cognitive Vision service client.
+
+Create briefcase.yaml
+```yaml
+azure:
+  cognitiveservice:
+    vision:
+      - name: vision1
+```
+
+```.env
+vision1=<TODO Cog Service Key>
+```
+
+```python
+import mlbriefcase
+
+# searches for briefcase.yaml in current directory and all parent directories
+briefcase = mlbriefcase.Briefcase()
+
+# Performs
+# - probe credential providers (e.g. environment variable, dotenv, ...) to find cognitive service key
+# - initialize the Cognitive Service Vision SDK object
+vision = briefcase['vision1'].get_client()
+
+vision.detect... # TODO
+```
+## Rules of the Game
+
+1. briefcase.yaml is searched in the current directory and if not found recursed until the root directory.
+2. The name of a service (e.g. vision1) is used as the key name for the corresponding secret. The key can be customized (see [Remapping Keys]).
+3. Credential providers are probed for keys in order
+ - [Jupyter Lab Credentials](TODO)
+ - [Python Keyring](TODO)
+ - Environment variables
+ - [.env](TODO) files
+ - All credential providers defined in the briefcase.yaml
+ Behavior can be customized - see [Specific credential provider]
+3. Any other required service property not found in the yaml is searched for in credential providers (e.g. one might not want to share the endpoint for a keyvault).
+
+# Features
+
+## Remapping Keys
+In the example below the Cognitive Service Vision token is searched using VISION_KEY. Since the url is not specified and remapped it's search using VISION_URL.
+
+```yaml
+azure:
+    cognitiveservice:
+        vision:
+         - name: vision1
+           secret:
+            key: VISION_KEY
+           url:
+            key: VISION_URL
+```
+
+## Specific credential provider
+As mentioned earlier which credential provider is used for lookup can be customized using the credentialprovider property.
+
+```yaml
+azure:
+    keyvault:
+     - name: kv1
+       dnsname: https://myvault.vault.azure.net/
+    
+    storage:
+        account:
+         - name: blob1
+           accountname: test1
+           credentialprovider: kv1
+        account:
+         - name: blob2
+           accountname: test2
+           credentialprovider: env
+
+python:
+    env: 
+     - name: env
+```
+
+## IntelliSense in VSCode
+To ease authoring we provide a JSON schema used by [VS Code yaml plugin](https://github.com/redhat-developer/vscode-yaml) and enables IntelliSense in VS Code.
+
+When developing update the VS Code settings to directly reference the JSON schema.
+```json
+    "yaml.schemas": {
+        "file:///mnt/c/work/Workspace/briefcase-schema.json": ["briefcase.yaml"]
+    }
+```
+
+
+TODO: Link to Redhat VS Code plugin
+TODO: Upload briefcase-schema.json to json-schema.org
+
+# Open Design decisions
+- Should built-in credential providers by predefined (e.g. env, dotenv, ...)
+- Should we allow for multiple credential providers?
 
 # Demo
 ![Demo recording](images/demo1.gif)
@@ -42,23 +178,6 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
   * We search all Azure subscriptions for the Azure Storage account 'workspacetest' and retrieve the key.
   * Finally we found the storage account keys and are able to generate a URL with an SAS token
 * At this point we can start with the data science work and look at the data using Pandas.
-
-# Features
-
-## Resource
-
-| Resource | Python | C# | JavaScript |
-|---|:---:|:---:|:---:|
-| Azure Blobs | :heavy_check_mark: | :heavy_check_mark: |  |
-| Azure Cognitive Service Anomaly Detection | :heavy_check_mark: |  |  |
-| Azure Cognitive Service Content Moderator | :heavy_check_mark: |  |  |
-| Azure Cognitive Service Face | :heavy_check_mark: |  |  |
-| Azure Cognitive Service Vision | :heavy_check_mark: |  |  |
-| Azure Cognitive Service Spell Check | :heavy_check_mark: |  |  |
-| Azure Cognitive Service Spell Text Analytics | :heavy_check_mark: |  |  |
-| Azure KeyVault | :heavy_check_mark: | :heavy_check_mark: |  |
-| Python SQL Alchemy (PostgreSQL, MySQL, SQLite, Oracle, Microsoft SQL Server) | :heavy_check_mark: |  |  |
-
 ## Authentication
 
 | Type | Python | C# | JavaScript |
@@ -71,32 +190,10 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 | Python KeyRing | :heavy_check_mark: |  |  |
 | JupyterLab Credentials | :heavy_check_mark: |  |  |
 
-If **no** credential provider is configured for a resource the following stores are probed in order:
-
-1. JupyterLab Credentials
-2. Python KeyRing
-3. Environment variables
-4. All resources of type credential provider (e.g. Azure KeyVault)
-
-Credential lookup is performed using both full-qualified name (=path in yaml) or the leaf name.
-
 For Azure resources the following methods are probed:
 
 1. Azure Managed Service identity (e.g. available in Azure Notebooks)
 2. Azure Device Login
-
-## Languages
-
-| Language | Audience | Use-case | Features |
-|---|---|---|---|
-| Python | Data Scientists | Data access from Notebooks across multiple environments (Azure ML notebook VM, Azure Notebooks, local) | Most |
-| C# | Engineers | Unit tests (during build and locally ) | Basic azure authentication and blob access |
-| JavaScript/TypeScript | Data Scientists & Engineers | Enable VSCode scenarios | Basic parsing |
-
-## Extensible YAML format
-
-The resource YAML format allows for arbitrary structure to model groups.
-Resources must be marked using YAML tags (e.g. !azure.storage.blob).
 
 # FAQ
 
@@ -125,48 +222,14 @@ Futhermore we aim for tooling support (e.g. list storage accounts in VSCode).
 * Improve service specific SDK discoverability
 * Organize resources using arbitrary hierarchies
 
-# How to get started
-Put your resources into *resources.yaml* (see sample below).
-
-In your Python notebook use
-
-```bash
-pip install mlbriefcase
-```
-
-```python
-import mlbriefcase
-
-ws = mlbriefcase.Briefcase() # assumes your current directory is some where in your git repository
-
-print(ws['csv1'].get_secret())
-
-# requires 'pip install pandas azureml-dataprep'
-df = ws['csv1'].to_pandas_dataframe()
-```
-
-In your C# project include [TODO] nuget and use
-
-```C#
-var ws = new workspace.Workspace()
-
-ws['csv1'].download()
-```
-
-# Examples
-## Data Science
-Larger projects require multiple notebooks -> share data set specification + authentication between notebooks
-
-## Development (C#)
-Within unit tests larger files are used and stored on an Azure Storage account, they can be looked up using this tool.
-In general cloud resource is simplified as authentication is performed using the currently logged in user.
-
 ## Python
 
 * Service SDK libraries are imported at time of usage (e.g. resource.get_client())
 * If import fails, exception contains the name of the pip package
 
 # Development
+
+# YAML / JSON Schema
 
 # Python
 

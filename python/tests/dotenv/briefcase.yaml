@@ -1,7 +1,0 @@
-dummy1:
-  !resource
-  abc: 1
-
-dummy2:
-  !resource
-  abc: 2

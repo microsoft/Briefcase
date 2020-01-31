@@ -1,0 +1,13 @@
+azure:
+  subscription:
+    - name: sub1
+      id: 03909a66-bef8-4d52-8e9a-a346604e0902
+  
+  # scenario
+  # be on Azure Databricks
+  # - get ARM authentication token using magic call
+  # - find all storage accounts 
+  # https://docs.microsoft.com/en-us/azure/governance/resource-graph/samples/starter#list-specific-tag
+  # - find a specific storage account
+  # -- download data
+  # -- 

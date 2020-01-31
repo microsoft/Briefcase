@@ -1,0 +1,16 @@
+azure:
+  auth:
+    serviceprincipal:
+      - name: myserviceprincipal1
+        clientid: b9a08b0b-2361-46ac-8487-f725c6730f67
+        tenantid: 72f988bf-86f1-41af-91ab-2d7cd011db47 
+
+  keyvault:
+    - name: myvault1
+      dnsname: https://workspacetest.vault.azure.net/
+      credential: myserviceprincipal1
+      
+  storage:
+    blob:
+      - name: workspacetest1
+        url: https://workspacetest.blob.core.windows.net/test/test.csv

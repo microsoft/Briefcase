@@ -1,0 +1,42 @@
+parameters:
+  pythonVersions: ["3.7", "3.6"]
+  operatingSystems: ["ubuntu-16.04", 'macos-10.14', 'vs2017-win2016']
+
+jobs:
+- job:
+  displayName: 'Python'
+  strategy:
+    matrix:
+      ${{ each py in parameters.pythonVersions }}:
+          ${{ each os in parameters.operatingSystems }}:
+            ${{ format(' {0} - {1}', py, os) }}:
+              imageName: ${{ os }}
+              python.version: ${{ py }}
+
+  pool:
+    vmImage: $(imageName)
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
+
+  - script: |
+      pip install -e .[test]
+    displayName: 'Install Package'
+
+  - script: |
+      pytest --junitxml=junit/test-unitttest.xml
+    displayName: 'Python Unit Tests'
+    env:
+      myserviceprincipal1: $(test_service_principal_secret)
+      myserviceprincipal2: $(test_service_principal_secret2)
+      myserviceprincipal2_clientid: $(test_service_principal_clientid2)
+      kv1_dnsname: $(test_keyvault_dns)
+
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFiles: '**/test-unitttest.xml'
+      testRunTitle: 'Test results for PyTest'

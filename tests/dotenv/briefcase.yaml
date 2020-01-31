@@ -1,0 +1,7 @@
+azure:
+  cognitiveservice:
+    spellcheck:
+      - name: dummy1
+
+    vision:
+      - name: dummy2

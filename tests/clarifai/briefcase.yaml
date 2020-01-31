@@ -1,0 +1,16 @@
+azure:
+  auth:
+    serviceprincipal:
+      - name: myserviceprincipal2
+        tenantid: 72f988bf-86f1-41af-91ab-2d7cd011db47 
+
+  keyvault:
+    - name: kv1
+      credential: myserviceprincipal2
+ 
+clarifai:
+  moderation:
+    - name: moderation
+      credentialprovider: kv1
+      secret:
+        key: Clarafai-API-Key
