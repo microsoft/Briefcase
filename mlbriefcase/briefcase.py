@@ -6,6 +6,7 @@ import logging
 import importlib
 import json
 import jsonschema
+from importlib_resources import read_text
 
 from .azure import *
 from .amazon import *
@@ -69,8 +70,7 @@ class Briefcase:
 
     def __validate(self, yaml_resources):
         # validate yaml
-        with open('/mnt/c/work/Workspace/briefcase-schema.json', 'r') as f:
-            schema = f.read()
+        schema = read_text('mlbriefcase', 'briefcase-schema.json')
         jsonschema.validate(yaml_resources, json.loads(schema))
 
     def __parse(self, content: str):
@@ -79,6 +79,8 @@ class Briefcase:
 
         # support empty file
         if yaml_resources is None:
+            self.resource_lookup = {}
+            self.resources = []
             return
 
         # validete against JSON schema
@@ -90,17 +92,13 @@ class Briefcase:
                 module = importlib.import_module("." + ".".join(path[:-1]), "mlbriefcase")
                 class_ = getattr(module, path[-1])
     
-                # instantiate target class and pass all parameters
-                # skip name parameter as all resources need it
-                builtin_names = ["name", "credentialprovider"]
-
                 # create resource
                 resource = class_()
 
                 # copy data
                 mappings = dict()
                 for k, v in node.items():
-                    if isinstance(v, str):
+                    if isinstance(v, str) or k == 'metadata':
                         setattr(resource, k, v)
                         continue
 
@@ -128,6 +126,9 @@ class Briefcase:
 
     def get_all_of_type(self, type: Type):
         return list(filter(lambda resource: isinstance(resource, type), self.resources))
+
+    def get_all(self):
+        return self.resources
 
     key_split_regex = re.compile('[./]')
 

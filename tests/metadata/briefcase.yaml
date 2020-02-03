@@ -1,0 +1,10 @@
+
+python:
+  sqlalchemy:
+    - name: query1
+      metadata:
+        a: 1
+        tag: datasource
+        b:
+        - 1
+        - 2
