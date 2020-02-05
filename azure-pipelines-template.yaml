@@ -27,6 +27,7 @@ jobs:
     displayName: 'Install Package'
 
   - script: |
+      cd tests
       pytest --junitxml=junit/test-unitttest.xml
     displayName: 'Python Unit Tests'
     env:
