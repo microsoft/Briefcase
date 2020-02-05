@@ -1,5 +1,5 @@
 [![Build Status](https://dev.azure.com/ossworkspace/Workspace/_apis/build/status/Microsoft.Workspace%20Python?branchName=master)](https://dev.azure.com/ossworkspace/Workspace/_build/latest?definitionId=1&branchName=master)
-Python
+[![PyPI version](https://badge.fury.io/py/mlbriefcase.svg)](https://badge.fury.io/py/mlbriefcase)
 
 # Contributing
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
