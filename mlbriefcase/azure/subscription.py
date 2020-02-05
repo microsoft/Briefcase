@@ -5,6 +5,8 @@ from typing import List
 
 
 class subscription(AzureResource):
+    pip_package = 'azure-mgmt-subscription'
+
     def get_resource_group(self):
         return getattr(self, 'resourcegroup', None)
 

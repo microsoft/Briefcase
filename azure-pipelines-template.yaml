@@ -27,8 +27,7 @@ jobs:
     displayName: 'Install Package'
 
   - script: |
-      cd tests
-      pytest --junitxml=junit/test-unitttest.xml
+      pytest --junitxml=junit/test-unitttest.xml tests
     displayName: 'Python Unit Tests'
     env:
       myserviceprincipal1: $(test_service_principal_secret)

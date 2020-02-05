@@ -18,7 +18,7 @@ setup(name='mlbriefcase',
       classifiers=[
           'Development Status :: 3 - Alpha',
           'Intended Audience :: Developers',
-          'Intended Audience :: Science/Research'
+          'Intended Audience :: Science/Research',
           'Topic :: Software Development',
           'License :: OSI Approved :: MIT License',
           'Programming Language :: Python :: 3',

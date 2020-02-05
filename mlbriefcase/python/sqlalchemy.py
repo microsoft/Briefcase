@@ -2,6 +2,8 @@ from ..base import KeyNotFoundException, Resource
 import sys
 
 class sqlalchemy(Resource):
+    pip_package = 'sqlalchemy'
+
     def get_client_lazy(self):
         import sqlalchemy as sql
 

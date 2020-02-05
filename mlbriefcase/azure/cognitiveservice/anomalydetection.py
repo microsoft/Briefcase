@@ -1,13 +1,11 @@
 from ...base import Resource
 
 class anomalydetection(Resource):
-    def get_client(self):
-        try:
-            from azure.cognitiveservices.anomalydetector import AnomalyDetectorClient
-            from msrest.authentication import CognitiveServicesCredentials
+    pip_package = 'azure-cognitiveservices-anomalydetector'
 
-            return AnomalyDetectorClient(self.url, CognitiveServicesCredentials(self.get_secret()))
-        except:
-            print ("Error missing package: run 'pip install --upgrade azure-cognitiveservices-anomalydetector'")
-            pass 
+    def get_client_lazy(self):
+        from azure.cognitiveservices.anomalydetector import AnomalyDetectorClient
+        from msrest.authentication import CognitiveServicesCredentials
+
+        return AnomalyDetectorClient(self.url, CognitiveServicesCredentials(self.get_secret()))
 	

@@ -8,7 +8,6 @@ azure:
     - name: kv1
       credential: myserviceprincipal2
   
-
 amazon:
   rekognition:
     - name: faceaws1

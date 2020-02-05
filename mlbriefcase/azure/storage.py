@@ -7,6 +7,8 @@ from ..datasource import URLDataSource
 from .azure_resource import AzureResource
 
 class account(AzureResource):
+    pip_package = 'azure-storage-blob'
+
     def __init__(self):
         self.secrettype = 'key'
 
@@ -80,6 +82,8 @@ class account(AzureResource):
 
 
 class blob(URLDataSource):
+    pip_package = 'azure-storage-blob'
+
     def download(self, target) -> None:
         datasource = self.get_briefcase()[self.account]
         block_blob_service = datasource.get_client().create_block_blob_service()

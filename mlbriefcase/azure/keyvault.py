@@ -3,6 +3,8 @@ from azure.keyvault.models import KeyVaultErrorException
 from ..credentialprovider import CredentialProvider
 
 class keyvault(CredentialProvider):
+    pip_package = 'azure-keyvault==1.1.0'
+
     def get_client_lazy(self):
         # create a KeyVaultAuthentication instance which will callback to the supplied adal_callback
         credential_client = self.get_briefcase()[self.credential].get_client()
