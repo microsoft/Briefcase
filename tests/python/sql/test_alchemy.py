@@ -11,8 +11,6 @@ def test_subdir():
 def test_sql_alchemy(test_subdir):
     ws = mlbriefcase.Briefcase()
 
-    # os.remove('deleteme_test_alchemy.db')
-
     query1 = ws['query1']
 
     # test fixture setup
@@ -21,6 +19,5 @@ def test_sql_alchemy(test_subdir):
     engine.execute("INSERT INTO table1 VALUES('abc')")
 
     # actual usage
-
     df = psql.read_sql("SELECT * FROM table1", con=engine)
     assert df.iloc[0][0] == 'abc'
